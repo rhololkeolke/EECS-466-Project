@@ -26,5 +26,8 @@
     <ClInclude Include="voronoi_diagram.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="event.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

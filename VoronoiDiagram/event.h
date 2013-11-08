@@ -7,7 +7,8 @@ namespace voronoi_diagram
 {
 
 	// TODO: Turn this into its own class
-	class ArcPtr {};
+	class Arc{};
+	typedef std::shared_ptr<Arc> ArcPtr;
 
 	enum class EventType { SITE, CIRCLE };
 
@@ -20,7 +21,21 @@ namespace voronoi_diagram
 		SitePtr site_; // site for event
 
 		// stuff used when type is CIRCLE
-		ArcPtr arc; // middle arc in triple defining the event
+		ArcPtr arc_; // middle arc in triple defining the event
+
+		Event(float y, SitePtr site) :
+			y_(y),
+			type_(EventType::SITE),
+			site_(site),
+			arc_(nullptr)
+		{}
+
+		Event(float y, ArcPtr arc) :
+			y_(y),
+			type_(EventType::CIRCLE),
+			site_(nullptr),
+			arc_(arc)
+		{}
 	} Event;
 
 }

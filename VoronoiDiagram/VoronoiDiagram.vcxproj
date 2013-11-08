@@ -79,6 +79,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="event.h" />
     <ClInclude Include="point.h" />
     <ClInclude Include="voronoi_diagram.h" />
   </ItemGroup>
