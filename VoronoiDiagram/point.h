@@ -2,6 +2,7 @@
 #define VORONOIDIAGRAM_POINT_H_
 
 #include <memory>
+#include <vector>
 
 namespace voronoi_diagram
 {
@@ -15,6 +16,11 @@ namespace voronoi_diagram
 	} Point;
 
 	typedef std::shared_ptr<Point> PointPtr;
+	typedef Point Site;
+	typedef PointPtr SitePtr;
+	typedef std::vector<SitePtr> Sites;
+	typedef std::shared_ptr<Sites> SitesPtr;
+	typedef std::shared_ptr<const Sites> SitesConstPtr;
 }
 
 #endif

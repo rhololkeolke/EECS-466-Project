@@ -6,11 +6,6 @@
 
 namespace voronoi_diagram
 {
-	typedef Point Site;
-	typedef PointPtr SitePtr;
-	typedef std::vector<SitePtr> Sites;
-	typedef std::shared_ptr<Sites> SitesPtr;
-	typedef std::shared_ptr<const Sites> SitesConstPtr;
 
 	class VoronoiDiagram
 	{
@@ -34,6 +29,8 @@ namespace voronoi_diagram
 			SitesConstPtr const_sites(sites_);
 			return const_sites;
 		}
+
+
 
 	private:
 		SitesPtr sites_;
