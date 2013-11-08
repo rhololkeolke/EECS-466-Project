@@ -27,6 +27,8 @@ namespace voronoi_diagram
 		EdgePtr edge_;
 
 		// methods
+		std::shared_ptr<BeachlineNode> getArcUnderSite(SitePtr site);
+
 	};
 
 	typedef std::shared_ptr<BeachlineNode> BeachlineNodePtr;
