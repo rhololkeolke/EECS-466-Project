@@ -90,10 +90,24 @@ namespace voronoi_diagram
 		std::shared_ptr<BeachlineNode> curr_edge(beachline_);
 		
 		// while we haven't hit an arc node
+		while(curr_edge->type_ != BeachlineNodeType::ARC)
+		{
+			// get the edge's position
+			Point edge_point = getEdgePoint(curr_edge, site->y);
+
 			// if the x position of the current edge is left of the site
+			if(edge_point.x  < site->x)
+			{
 				// make the current edge the parabola to the right
-			// else
+				curr_edge = curr_edge->getRightChild();
+			}
+			else
+			{
 				// make the current edge the parabola to the left
+				curr_edge = curr_edge->getLeftChild();
+			}
+
+		}
 
 		// when the while loop finishes the curr_edge is actually an arc (because its a leaf)
 		return curr_edge;
