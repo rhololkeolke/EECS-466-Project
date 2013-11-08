@@ -76,9 +76,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="beachline_node.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="beachline_node.h" />
     <ClInclude Include="event.h" />
     <ClInclude Include="point.h" />
     <ClInclude Include="voronoi_diagram.h" />

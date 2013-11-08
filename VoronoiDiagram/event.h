@@ -1,14 +1,12 @@
 #ifndef VORONOIDIAGRAM_EVENT_H_
 #define VORONOIDIAGRAM_EVENT_H_
 
+#include <memory>
+#include "beachline_node.h"
 #include "point.h"
 
 namespace voronoi_diagram
 {
-
-	// TODO: Turn this into its own class
-	class Arc{};
-	typedef std::shared_ptr<Arc> ArcPtr;
 
 	enum class EventType { SITE, CIRCLE };
 
@@ -21,22 +19,23 @@ namespace voronoi_diagram
 		SitePtr site_; // site for event
 
 		// stuff used when type is CIRCLE
-		ArcPtr arc_; // middle arc in triple defining the event
+		std::weak_ptr<BeachlineNode> arc_; // middle arc in triple defining the event
 
-		Event(float y, SitePtr site) :
+		Event_(float y, SitePtr site) :
 			y_(y),
 			type_(EventType::SITE),
-			site_(site),
-			arc_(nullptr)
+			site_(site)
 		{}
 
-		Event(float y, ArcPtr arc) :
+		Event_(float y, std::shared_ptr<BeachlineNode> arc) :
 			y_(y),
 			type_(EventType::CIRCLE),
 			site_(nullptr),
 			arc_(arc)
 		{}
 	} Event;
+
+	typedef std::shared_ptr<Event> EventPtr;
 
 }
 
