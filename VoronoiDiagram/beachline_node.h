@@ -11,12 +11,10 @@ namespace voronoi_diagram
 
 	enum class BeachlineNodeType { ARC, EDGE };
 
-	class BeachlineNode
+	class BeachlineNode : public std::enable_shared_from_this<BeachlineNode>
 	{
 	public:
-		std::shared_ptr<BeachlineNode> left_child_;
-		std::shared_ptr<BeachlineNode> right_child_;
-		std::weak_ptr<BeachlineNode> parent_;
+
 		BeachlineNodeType type_;
 
 		// when an arc
@@ -29,6 +27,45 @@ namespace voronoi_diagram
 		// methods
 		std::shared_ptr<BeachlineNode> getArcUnderSite(SitePtr site);
 
+		std::shared_ptr<BeachlineNode> getLeftChild()
+		{
+			return left_child_;
+		}
+
+		void setLeftChild(std::shared_ptr<BeachlineNode> child)
+		{
+			left_child_ = child;
+			left_child_->parent_ = shared_from_this();
+		}
+
+		std::shared_ptr<BeachlineNode> getRightChild()
+		{
+			return right_child_;
+		}
+
+		void setRightChild(std::shared_ptr<BeachlineNode> child)
+		{
+			right_child_ = child;
+			right_child_->parent_ = shared_from_this();
+		}
+
+		std::shared_ptr<BeachlineNode> getParent()
+		{
+			return parent_.lock();
+		}
+
+		void setParent(std::shared_ptr<BeachlineNode> parent)
+		{
+			parent_ = parent;
+		}
+
+		static std::shared_ptr<BeachlineNode> getLeftArc(std::shared_ptr<BeachlineNode> node);
+		static std::shared_ptr<BeachlineNode> getRightArc(std::shared_ptr<BeachlineNode> node);
+
+	private:
+		std::shared_ptr<BeachlineNode> left_child_;
+		std::shared_ptr<BeachlineNode> right_child_;
+		std::weak_ptr<BeachlineNode> parent_;
 	};
 
 	typedef std::shared_ptr<BeachlineNode> BeachlineNodePtr;

@@ -82,4 +82,61 @@ namespace voronoi_diagram
 		// circle_event <- create new circle event with arc = p and y = s.y + r
 		// event_queue.push(circle_event)
 	}
+
+	// TODO: Implement me
+	BeachlineNodePtr VoronoiDiagram::getArcUnderSite(SitePtr site)
+	{
+		// initialize the node to the root of the beachline
+		std::shared_ptr<BeachlineNode> curr_edge(beachline_);
+		
+		// while we haven't hit an arc node
+			// if the x position of the current edge is left of the site
+				// make the current edge the parabola to the right
+			// else
+				// make the current edge the parabola to the left
+
+		// when the while loop finishes the curr_edge is actually an arc (because its a leaf)
+		return curr_edge;
+	}
+
+	// TODO: Implement me
+	Point VoronoiDiagram::getEdgePoint(BeachlineNodePtr edge, float sweep_line_pos)
+	{
+		// solve for the intersection of the two parabola's defining this edge
+		BeachlineNodePtr left_arc = BeachlineNode::getLeftArc(edge);
+		BeachlineNodePtr right_arc = BeachlineNode::getRightArc(edge);
+
+		// just a convenince variable so I don't have to type this over and over
+		float denom1 = 2.0f*(left_arc->site_->y - sweep_line_pos);
+		// calculate the coefficients of the left arc's equation
+		float a1 = 1/denom1;
+		float b1 = -2.0f*left_arc->site_->x / denom1;
+		float c1 = (left_arc->site_->x*left_arc->site_->x + left_arc->site_->y*left_arc->site_->y + sweep_line_pos*sweep_line_pos) / denom1;
+
+		// now do the same thing for the right parabola
+		float denom2 = 2.0f*(right_arc->site_->y - sweep_line_pos);
+		float a2 = 1/denom2;
+		float b2 = -2.0f*right_arc->site_->x / denom2;
+		float c2 = (right_arc->site_->x*right_arc->site_->x + right_arc->site_->y*right_arc->site_->y + sweep_line_pos*sweep_line_pos) / denom2;
+
+		// now get the coefficients for the quadratic equation that we'll be solving
+		float a = a1 - a2;
+		float b = b1 - b2;
+		float c = c1 - c2;
+
+		float discriminant = b*b - 4.0f*a*c;
+		float x1 = (-b + std::sqrt(discriminant))/(2.0f*a);
+		float x2 = (-b - std::sqrt(discriminant))/(2.0f*a);
+
+		Point edge_point(0.0f, 0.0f);
+		if(left_arc->site_->y < right_arc->site_->y)
+			edge_point.x = std::max(x1, x2);
+		else
+			edge_point.x = std::min(x1, x2);
+
+		// finally plug the x back into one of the equations and get the y point
+		edge_point.y = a1 * edge_point.x*edge_point.x + b1 * edge_point.x + c1;
+
+		return edge_point;
+	}
 }
