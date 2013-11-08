@@ -1,11 +1,20 @@
 #ifndef VORONOIDIAGRAM_VORONOIDIAGRAM_H_
 #define VORONOIDIAGRAM_VORONOIDIAGRAM_H_
 
+#include "beachline_node.h"
+#include "event.h"
+#include "edge.h"
 #include "point.h"
 #include <vector>
+#include <queue>
 
 namespace voronoi_diagram
 {
+
+	typedef std::vector<EdgePtr> Edges;
+	typedef std::shared_ptr<Edges> EdgesPtr;
+
+	typedef std::priority_queue<EventPtr, std::vector<EventPtr>, Event::CompareEvent> EventQueue;
 
 	class VoronoiDiagram
 	{
@@ -30,7 +39,11 @@ namespace voronoi_diagram
 			return const_sites;
 		}
 
+		EdgesPtr getEdges();
 
+	protected:
+		
+		void checkCircleEvent(BeachlineNodePtr arc, EventQueue event_queue);
 
 	private:
 		SitesPtr sites_;

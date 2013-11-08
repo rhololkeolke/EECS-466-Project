@@ -21,6 +21,9 @@
     <ClCompile Include="beachline_node.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="voronoi_diagram.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="point.h">

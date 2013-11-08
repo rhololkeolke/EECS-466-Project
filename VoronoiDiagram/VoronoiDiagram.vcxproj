@@ -78,6 +78,7 @@
   <ItemGroup>
     <ClCompile Include="beachline_node.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="voronoi_diagram.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="beachline_node.h" />
