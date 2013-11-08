@@ -7,6 +7,7 @@
 #include "point.h"
 #include <vector>
 #include <queue>
+#include <set>
 
 namespace voronoi_diagram
 {
@@ -54,6 +55,7 @@ namespace voronoi_diagram
 		SitesPtr sites_;
 		BeachlineNodePtr beachline_;
 		EventQueue event_queue_;
+		std::set<EventPtr, Event::EqualEvent> deleted_events_;
 	};
 
 }

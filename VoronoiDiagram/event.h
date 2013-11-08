@@ -22,8 +22,8 @@ namespace voronoi_diagram
 		// stuff used when type is CIRCLE
 		std::weak_ptr<BeachlineNode> arc_; // middle arc in triple defining the event
 
-		Event_(float y, SitePtr site) :
-			y_(y),
+		Event_(SitePtr site) :
+			y_(site->y),
 			type_(EventType::SITE),
 			site_(site)
 		{}
@@ -38,6 +38,11 @@ namespace voronoi_diagram
 		struct CompareEvent : public std::binary_function<std::shared_ptr<struct Event_>, std::shared_ptr<struct Event_>, bool>
 		{
 			bool operator()(const std::shared_ptr<struct Event_> l, const std::shared_ptr<struct Event_> r) const { return (l->y_ < r->y_); }
+		};
+
+		struct EqualEvent : public std::binary_function<std::shared_ptr<struct Event_>, std::shared_ptr<struct Event_>, bool>
+		{
+			bool operator()(const std::shared_ptr<struct Event_> l, const std::shared_ptr<struct Event_> r) const { return (l.get() == r.get()); }
 		};
 	} Event;
 

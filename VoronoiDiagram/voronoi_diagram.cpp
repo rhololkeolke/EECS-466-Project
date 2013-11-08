@@ -6,18 +6,54 @@ namespace voronoi_diagram
 	EdgesPtr VoronoiDiagram::getEdges()
 	{
 		EdgesPtr edges(new Edges());
-		BeachlineNodePtr beachline;
+
+		// reinitialize the event queue
+		while(!event_queue_.empty())
+			event_queue_.pop();
+		// reinitialize the beachline
+		beachline_.reset();
 
 		// for each site
+		for(Sites::iterator site = sites_->begin();
+			site != sites_->end();
+			site++)
+		{
+
 			// event <- create site event
+			EventPtr site_event(new Event(*site));
 			// push event into event queue
+			event_queue_.push(site_event);
+		}
 
 		// while event queue is not empty
+		while(!event_queue_.empty())
+		{
 			// curr_event <- pop from event queue
+			EventPtr curr_event = event_queue_.top();
+			event_queue_.pop();
+
+			// verify that this event has not been marked for deletion
+			// priority queues don't support random deletions so the algorithm
+			// marks removed events for deletion
+			if(deleted_events_.find(curr_event) != deleted_events_.end())
+			{
+				// remove from the set of deleted events
+				deleted_events_.erase(curr_event);
+				continue;
+			}
+
 			// if curr_event is site event
+			if(curr_event->type_ == EventType::SITE)
+			{
 				// add arc to beachline with curr_event's site
-			// else
+				addArc(curr_event->site_);
+			}
+			else
+			{
 				// remove Arc specified in curr_event from beachline
+				removeArc(curr_event->arc_.lock());
+			}
+		}
 
 		return edges;
 	}
