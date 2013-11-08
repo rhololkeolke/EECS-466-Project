@@ -65,6 +65,21 @@ namespace voronoi_diagram
 	// TODO: implement me
 	void VoronoiDiagram::checkCircleEvent(BeachlineNodePtr arc, EventQueue event_queue)
 	{
-
+		// left_arc <- arc to the left of p
+		// right_arc <- arc to the right of p
+		// xl <- left edge of p
+		// xr <- right edge of p
+		// if left_arc or right_arc does not exist
+			// return ( You need 3 points to have a circle event)
+		// if right_arc's site == left arc's site
+			// return (You need 3 points to have a circle event)
+		// s <- location where xl and xr cross each other
+		// if s does not exist
+			// return
+		// r <- distance between s and p.site (circumcircle radius)
+		// if s.y + r is under the sweepline
+			// return
+		// circle_event <- create new circle event with arc = p and y = s.y + r
+		// event_queue.push(circle_event)
 	}
 }
