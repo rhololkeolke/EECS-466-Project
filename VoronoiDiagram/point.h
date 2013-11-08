@@ -9,7 +9,7 @@ namespace voronoi_diagram
 	{
 		float x, y;
 
-		Point(float x, float y) :
+		Point_(float x, float y) :
 			x(x), y(y)
 		{}
 	} Point;
