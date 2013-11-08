@@ -5,7 +5,7 @@ namespace voronoi_diagram
 	// TODO: implement me
 	EdgesPtr VoronoiDiagram::getEdges()
 	{
-		EdgesPtr edges(new Edges());
+		edges_.reset(new Edges());
 
 		// reinitialize the event queue
 		while(!event_queue_.empty())
@@ -46,7 +46,7 @@ namespace voronoi_diagram
 			if(curr_event->type_ == EventType::SITE)
 			{
 				// add arc to beachline with curr_event's site
-				addArc(curr_event->site_);
+				addArc(curr_event);
 			}
 			else
 			{
@@ -55,25 +55,74 @@ namespace voronoi_diagram
 			}
 		}
 
-		return edges;
+		return edges_;
 	}
 
 	// TODO: implement me!
-	void VoronoiDiagram::addArc(SitePtr site)
+	void VoronoiDiagram::addArc(EventPtr event)
 	{
+		// if this is the first arc
+		if(!beachline_)
+		{
+			// initialize the beachline with an arc focused at this site
+			beachline_.reset(new BeachlineNode(event->site_));
+			return;
+		}
+
 		// split_arc <- get the arc under the site
+		BeachlineNodePtr split_arc = getArcUnderSite(event->site_);
 		// if split_arc has a circle event
+		if(split_arc->circle_event_)
+		{
 			// mark the circle event for deletion
+			deleted_events_.insert(split_arc->circle_event_);
+		}
+
+		// start a new edge at this point
+		// TODO: Fix the y-coordinate
+		PointPtr start_point(getArcPoint(split_arc->site_, event->site_->y, event->site_->x));
+		points_.push_back(start_point);
+
+		// A new edge will grow from this parabola
+		// for programmatica reasons this is modeled as 2 edges
+		// one grows to the left out of the intersection point between the vertical ray and the split parabola
+		// one grows to the right out of the intersection point between the verticle ray and the split parabola
+		EdgePtr left_edge(new Edge(start_point, split_arc->site_, event->site_));
+		EdgePtr right_edge(new Edge(start_point, event->site_, split_arc->site_));
+
+		// the left edge points to the right edeg
+		// this allows for the different edge segments to be joined after the algorithm is complete
+		left_edge->neighbor_ = right_edge;
+
+		// add the left edge to the list of edges
+		edges_->push_back(left_edge);
+
 		// a <- new arc with split_arc's site
+		BeachlineNodePtr arc0(new BeachlineNode(split_arc->site_));
 		// b <- new arc with given site
+		BeachlineNodePtr arc1(new BeachlineNode(event->site_));
 		// c <- new arc with split_arc's site
-		// xl <- new dangling edge starting from point under site
-		// xr <- new dangling edge starting from point under site
-		// xl.normal <- normal to (a.site, b.site)
-		// xr.normal <- normal to (b.site, c.site)
+		BeachlineNodePtr arc2(new BeachlineNode(split_arc->site_));
+		
 		// replace split_arc with a, xl, b, xr, c
+		// ----------------------------------------
+		// convert the split_arc to an edge node
+		BeachlineNodePtr left_edge_node = split_arc;
+		left_edge_node->type_ = BeachlineNodeType::EDGE;
+		// set the left child of the new edge node to arc0
+		left_edge_node->setLeftChild(arc0);
+		// set the right child of the new edge node to a new edge node
+		BeachlineNodePtr right_edge_node(new BeachlineNode(right_edge));
+		right_edge_node->setLeftChild(arc1);
+		right_edge_node->setRightChild(arc2);
+		// set this node as the right child of the left edge
+		left_edge_node->setRightChild(right_edge_node);
+
+
 		// check for circle event with a in the middle
+		checkCircleEvent(arc0);
 		// check for circle event with c in the middle
+		checkCircleEvent(arc2);
 		// NOTE: don't check for circle event with b in the middle because a and c have the same site (need 3 sites to make a circle event)
 	}
 
@@ -119,7 +168,6 @@ namespace voronoi_diagram
 		// event_queue.push(circle_event)
 	}
 
-	// TODO: Implement me
 	BeachlineNodePtr VoronoiDiagram::getArcUnderSite(SitePtr site)
 	{
 		// initialize the node to the root of the beachline
@@ -149,7 +197,6 @@ namespace voronoi_diagram
 		return curr_edge;
 	}
 
-	// TODO: Implement me
 	Point VoronoiDiagram::getEdgePoint(BeachlineNodePtr edge, float sweep_line_pos)
 	{
 		// solve for the intersection of the two parabola's defining this edge
@@ -188,5 +235,17 @@ namespace voronoi_diagram
 		edge_point.y = a1 * edge_point.x*edge_point.x + b1 * edge_point.x + c1;
 
 		return edge_point;
+	}
+
+	// get the point on a parabola given a focus, directrix and x coordinate
+	PointPtr VoronoiDiagram::getArcPoint(PointPtr focus, float directrix, float x)
+	{
+		double denom = 2 * (focus->y - directrix);
+		double a = 1.0f / denom;
+		double b = -2.0f * focus->x / denom;
+		double c = (focus->x*focus->x + focus->y*focus->y + directrix*directrix)/ denom;
+
+		PointPtr arc_point(new Point(x, a*x*x + b*x + c));
+		return arc_point;
 	}
 }

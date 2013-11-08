@@ -92,6 +92,8 @@ int main(int argc, char** argv)
 
 	diagram.reset(new VoronoiDiagram(sites));
 
+	voronoi_diagram::EdgesPtr edges = diagram->getEdges();
+
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowPosition(100,100);

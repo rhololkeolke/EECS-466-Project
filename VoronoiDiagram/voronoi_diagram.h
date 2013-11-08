@@ -44,18 +44,22 @@ namespace voronoi_diagram
 
 	protected:
 		
-		void addArc(SitePtr site);
+		void addArc(EventPtr event);
 		void removeArc(BeachlineNodePtr arc);
 		void checkCircleEvent(BeachlineNodePtr arc);
 
 		BeachlineNodePtr getArcUnderSite(SitePtr site);
 		Point getEdgePoint(BeachlineNodePtr edge, float sweep_line_pos);
+		PointPtr getArcPoint(PointPtr focus, float directrix, float x);
 
 	private:
-		SitesPtr sites_;
-		BeachlineNodePtr beachline_;
-		EventQueue event_queue_;
-		std::set<EventPtr, Event::EqualEvent> deleted_events_;
+		SitesPtr sites_; // the sites that this diagram is being generated for
+		BeachlineNodePtr beachline_; // Holds the representation of the beachline used during calculation
+		EventQueue event_queue_; // Holds the 2 types of events sorted by y coordinate
+		std::set<EventPtr, Event::EqualEvent> deleted_events_; // holds events that should be deleted when popped instead of executed
+
+		Points points_; // points created during the algorithm's execution
+		EdgesPtr edges_; // edges created during the algorithm's execution
 	};
 
 }

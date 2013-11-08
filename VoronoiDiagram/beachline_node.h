@@ -15,6 +15,24 @@ namespace voronoi_diagram
 	{
 	public:
 
+		BeachlineNode(SitePtr site) :
+			type_(BeachlineNodeType::ARC),
+			site_(site),
+			circle_event_(nullptr),
+			edge_(nullptr)
+		{}
+
+		// TODO: Consider making this a factory method to support
+		// constructing an edge with a specified left and right edeg
+		// can't do it in a normal constructor, because enabled_shared_from_this
+		// doesn't work in a constructor
+		BeachlineNode(EdgePtr edge) :
+			type_(BeachlineNodeType::EDGE),
+			site_(nullptr),
+			circle_event_(nullptr),
+			edge_(edge)
+		{}
+
 		BeachlineNodeType type_;
 
 		// when an arc
