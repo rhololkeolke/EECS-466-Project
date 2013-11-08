@@ -35,5 +35,8 @@
     <ClInclude Include="beachline_node.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="edge.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
