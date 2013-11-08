@@ -2,6 +2,7 @@
 #define VORONOIDIAGRAM_BEACHLINE_NODE_H_
 
 #include <memory>
+#include "edge.h"
 #include "point.h"
 
 namespace voronoi_diagram
@@ -23,10 +24,14 @@ namespace voronoi_diagram
 		std::shared_ptr<struct Event_> circle_event_; // event that is poised to kill this arc
 
 		// when an edge
-		// TODO: add data needed for when this acts as an edge
+		EdgePtr edge_;
 
-
+		// methods
+		void addArc(SitePtr site);
+		void removeArc(std::shared_ptr<BeachlineNode> arc);
 	};
+
+	typedef std::shared_ptr<BeachlineNode> BeachlineNodePtr;
 }
 
 #endif
