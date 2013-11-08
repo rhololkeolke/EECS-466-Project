@@ -43,6 +43,8 @@ namespace voronoi_diagram
 
 	protected:
 		
+		void addArc(SitePtr stie, EventQueue event_queue);
+		void removeArc(BeachlineNodePtr arc, EventQueue event_queue);
 		void checkCircleEvent(BeachlineNodePtr arc, EventQueue event_queue);
 
 	private:
