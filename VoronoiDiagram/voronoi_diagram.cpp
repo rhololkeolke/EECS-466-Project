@@ -23,7 +23,7 @@ namespace voronoi_diagram
 	}
 
 	// TODO: implement me!
-	void VoronoiDiagram::addArc(SitePtr site, EventQueue event_queue)
+	void VoronoiDiagram::addArc(SitePtr site)
 	{
 		// split_arc <- get the arc under the site
 		// if split_arc has a circle event
@@ -42,7 +42,7 @@ namespace voronoi_diagram
 	}
 
 	// TODO: implement me!
-	void VoronoiDiagram::removeArc(BeachlineNodePtr arc, EventQueue event_queue)
+	void VoronoiDiagram::removeArc(BeachlineNodePtr arc)
 	{
 		// left_arc <- arc left of given arc
 		// right_arc <- arc left of given arc
@@ -63,7 +63,7 @@ namespace voronoi_diagram
 	}
 
 	// TODO: implement me
-	void VoronoiDiagram::checkCircleEvent(BeachlineNodePtr arc, EventQueue event_queue)
+	void VoronoiDiagram::checkCircleEvent(BeachlineNodePtr arc)
 	{
 		// left_arc <- arc to the left of p
 		// right_arc <- arc to the right of p

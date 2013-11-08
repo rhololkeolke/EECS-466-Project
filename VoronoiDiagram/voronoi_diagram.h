@@ -43,13 +43,14 @@ namespace voronoi_diagram
 
 	protected:
 		
-		void addArc(SitePtr stie, EventQueue event_queue);
-		void removeArc(BeachlineNodePtr arc, EventQueue event_queue);
-		void checkCircleEvent(BeachlineNodePtr arc, EventQueue event_queue);
+		void addArc(SitePtr site);
+		void removeArc(BeachlineNodePtr arc);
+		void checkCircleEvent(BeachlineNodePtr arc);
 
 	private:
 		SitesPtr sites_;
-
+		BeachlineNodePtr beachline_;
+		EventQueue event_queue_;
 	};
 
 }
