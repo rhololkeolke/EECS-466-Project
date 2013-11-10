@@ -53,6 +53,16 @@ namespace voronoi_diagram
 			height_ = height;
 		}
 
+		float getWidth()
+		{
+			return width_;
+		}
+
+		float getHeight()
+		{
+			return height_;
+		}
+
 	protected:
 		
 		void addArc(EventPtr event);
@@ -65,9 +75,9 @@ namespace voronoi_diagram
 		PointPtr getEdgeIntersection(EdgePtr a, EdgePtr b);
 		void finishEdges(BeachlineNodePtr node);
 
-	private:
 		SitesPtr sites_; // the sites that this diagram is being generated for
 		BeachlineNodePtr beachline_; // Holds the representation of the beachline used during calculation
+
 		EventQueue event_queue_; // Holds the 2 types of events sorted by y coordinate
 		std::set<EventPtr, Event::EqualEvent> deleted_events_; // holds events that should be deleted when popped instead of executed
 
@@ -75,6 +85,7 @@ namespace voronoi_diagram
 		EdgesPtr edges_; // edges created during the algorithm's execution
 
 		float width_, height_; // dimensions of the diagram
+
 	};
 
 }

@@ -14,6 +14,15 @@ namespace voronoi_diagram
 
 		virtual ~AnimatedVoronoiDiagram()
 		{}
+
+		void display(void);
+
+		void nextEvent();
+
+		void restartAnimation();
+
+	private:
+		EventPtr curr_event_;
 	};
 }
 

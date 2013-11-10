@@ -76,6 +76,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="animated_voronoi_diagram.cpp" />
     <ClCompile Include="beachline_node.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="voronoi_diagram.cpp" />

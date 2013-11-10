@@ -1,5 +1,6 @@
 #include "GL/glut.h"
 #include "animated_voronoi_diagram.h"
+#include <functional>
 #include <cstdlib>
 #include <iostream>
 
@@ -35,38 +36,7 @@ SitesPtr generateSites(int num_sites, float diagram_width, float diagram_height,
 
 void DisplayFunc(void)
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-
-	gluOrtho2D(-g_diagram_width/2.0f, g_diagram_width/2.0f, -g_diagram_height/2.0f, g_diagram_height/2.0f);
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-	glPointSize(4.0f);
-	glColor3f(1.0f, 1.0f, 1.0f);
-	glBegin(GL_POINTS); {
-		SitesConstPtr sites = diagram->getSites();
-		for(Sites::const_iterator site = sites->begin();
-			site != sites->end();
-			site++)
-		{
-			glVertex2f((*site)->x, (*site)->y);
-		}
-	} glEnd();
-
-	glColor3f(1.0f, 1.0f, 0.0f);
-	glBegin(GL_LINES); {
-		for(voronoi_diagram::Edges::iterator edge = edges->begin(); edge != edges->end(); edge++)
-		{
-			glVertex2f((*edge)->start_->x, (*edge)->start_->y);
-			glVertex2f((*edge)->end_->x, (*edge)->end_->y);
-		}
-	} glEnd();
-
-	glutSwapBuffers();
+	diagram->display();
 }
 
 void MouseFunc(int button,int state,int x,int y)
@@ -87,7 +57,18 @@ void KeyboardFunc(unsigned char key, int x, int y)
 	case 'q':
 		exit(0);
 		break;
+	case 'N':
+	case 'n':
+		printf("next event\n");
+		diagram->nextEvent();
+		break;
+	case 'R':
+	case 'r':
+		printf("restarting animation\n");
+		diagram->restartAnimation();
+		break;
 	}
+	glutPostRedisplay();
 }
 
 void ReshapeFunc(int x,int y)
@@ -103,7 +84,7 @@ int main(int argc, char** argv)
 
 	diagram.reset(new AnimatedVoronoiDiagram(sites, g_diagram_width, g_diagram_height));
 
-	edges = diagram->getEdges();
+	//edges = diagram->getEdges();
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
