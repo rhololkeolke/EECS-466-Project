@@ -74,4 +74,33 @@ namespace voronoi_diagram
 		return curr_node;
 	}
 
+	// to be a left edge of an arc the arc must have come from the right subtree
+	std::shared_ptr<BeachlineNode> BeachlineNode::getLeftEdge(std::shared_ptr<BeachlineNode> node)
+	{
+		std::shared_ptr<BeachlineNode> last_node = node;
+		std::shared_ptr<BeachlineNode> curr_node = node->getParent();
+		// keep going until we come from a right subtree or we run out of nodes
+		while(curr_node && curr_node->getLeftChild().get() == last_node.get())
+		{
+			last_node = curr_node;
+			curr_node = last_node->getParent();
+		}
+
+		return curr_node;
+	}
+
+	// to be a right edge of an arc the arc must have come from the edge's left subtree
+	std::shared_ptr<BeachlineNode> BeachlineNode::getRightEdge(std::shared_ptr<BeachlineNode> node)
+	{
+		std::shared_ptr<BeachlineNode> last_node = node;
+		std::shared_ptr<BeachlineNode> curr_node = node->getParent();
+		// keep going until we come from a left subtree or we run out of nodes
+		while(curr_node && curr_node->getRightChild().get() == last_node.get())
+		{
+			last_node = curr_node;
+			curr_node = last_node->getParent();
+		}
+		return curr_node;
+	}
+
 }

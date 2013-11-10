@@ -79,6 +79,8 @@ namespace voronoi_diagram
 
 		static std::shared_ptr<BeachlineNode> getLeftArc(std::shared_ptr<BeachlineNode> node);
 		static std::shared_ptr<BeachlineNode> getRightArc(std::shared_ptr<BeachlineNode> node);
+		static std::shared_ptr<BeachlineNode> getLeftEdge(std::shared_ptr<BeachlineNode> node);
+		static std::shared_ptr<BeachlineNode> getRightEdge(std::shared_ptr<BeachlineNode> node);
 
 	private:
 		std::shared_ptr<BeachlineNode> left_child_;

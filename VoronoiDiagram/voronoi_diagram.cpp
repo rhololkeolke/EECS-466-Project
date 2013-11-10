@@ -51,7 +51,7 @@ namespace voronoi_diagram
 			else
 			{
 				// remove Arc specified in curr_event from beachline
-				removeArc(curr_event->arc_.lock());
+				removeArc(curr_event);
 			}
 		}
 
@@ -127,24 +127,95 @@ namespace voronoi_diagram
 	}
 
 	// TODO: implement me!
-	void VoronoiDiagram::removeArc(BeachlineNodePtr arc)
+	void VoronoiDiagram::removeArc(EventPtr event)
 	{
+		// get pointer to arc that will be removed
+		BeachlineNodePtr middle_arc = event->arc_.lock();
+
 		// left_arc <- arc left of given arc
+		BeachlineNodePtr left_arc = BeachlineNode::getLeftArc(beachline_);
 		// right_arc <- arc left of given arc
+		BeachlineNodePtr right_arc = BeachlineNode::getRightArc(beachline_);
 		// if left_arc has a circle event
+		if(left_arc->circle_event_)
+		{
 			// remove left_arc's circle event
+			deleted_events_.insert(left_arc->circle_event_);
+			left_arc->circle_event_.reset();
+		}
 		// if right_arc has a circle event
+		if(right_arc->circle_event_)
+		{
 			// remove right_arc's circle event
+			deleted_events_.insert(right_arc->circle_event_);
+			left_arc->circle_event_.reset();
+		}
+
 		// s <- circumcenter between left_arc's site, given arc's site and right_arc's site
+		PointPtr s = getArcPoint(middle_arc->site_, event->site_->y, event->site_->x); // TODO: Check this logic
+		points_.push_back(s);
+		
+		// finish the left and right edges of the arc to be removed at the circumcircle site
+		BeachlineNodePtr left_edge = BeachlineNode::getLeftEdge(middle_arc);
+		BeachlineNodePtr right_edge = BeachlineNode::getRightEdge(middle_arc);
+		left_edge->edge_->end_ = s;
+		right_edge->edge_->end_ = s;
+
 		// x <- new dangling edge at s
-		// x.normal <- normal to (left_arc's site, right_arc's site)
-		// xl <- left neighbor edge
-		// finish xl at s
-		// xr <- right neighbor edge
-		// finish xr at s
+		EdgePtr new_edge(new Edge(s, left_arc->site_, right_arc->site_));
+		edges_->push_back(new_edge);
+
+		// if the left_edge is higher in the tree replace it with the new edge
+		// otherwise replace the right edge
+		BeachlineNodePtr highest_edge;
+		BeachlineNodePtr curr_node = middle_arc->getParent();
+		while(curr_node) // while we haven't reached the root
+		{
+			if(curr_node.get() == left_edge.get())
+				highest_edge = left_edge;
+			if(curr_node.get() == right_edge.get())
+				highest_edge = right_edge;
+		}
+		highest_edge->edge_ = new_edge;
+
 		// replace xl, given arc, xr by x
+		BeachlineNodePtr parent_node = middle_arc->getParent();
+		BeachlineNodePtr grandparent_node = parent_node->getParent();
+		// if the arc to be replaced is left of its edge (we want to keep the right subtree of the edge)
+		if(parent_node->getLeftChild().get() == middle_arc.get())
+		{
+			// if the arc is in the left subtree of its grandparent
+			if(grandparent_node->getLeftChild().get() == parent_node.get())
+			{
+				// replace the grandparent's left subtree with the right subtree of the arc's edge
+				grandparent_node->setLeftChild(parent_node->getRightChild());
+			}
+			else
+			{
+				// replace the grandparent's right subtree with the right subtree of the arc's edge
+				grandparent_node->setRightChild(parent_node->getRightChild());
+			}
+		}
+		else // the arc to be replaced is to the right of its edge (we want to keep the left subtree of the edge)
+		{
+			// if the arc is in the left subtree of its grandparent
+			if(grandparent_node->getLeftChild().get() == parent_node.get())
+			{
+				// replace the grandparent's left subtree with the left subtree of the arc's edge
+				grandparent_node->setLeftChild(parent_node->getLeftChild());
+			}
+			else
+			{
+				// replace the grandparent's left subtree with the right subtree of the arc's edge
+				grandparent_node->setRightChild(parent_node->getLeftChild());
+			}
+
+		}
+
 		// checkCircleEvent(left_arc)
+		checkCircleEvent(left_arc);
 		// checkCircleEvent(right_arc)
+		checkCircleEvent(right_arc);
 	}
 
 	// TODO: implement me
