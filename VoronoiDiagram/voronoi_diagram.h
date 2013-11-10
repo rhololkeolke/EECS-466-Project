@@ -31,6 +31,9 @@ namespace voronoi_diagram
 			sites_(new Sites())
 		{}
 
+		virtual ~VoronoiDiagram()
+		{}
+
 		void addPoint(SitePtr site)
 		{
 			sites_->push_back(site);

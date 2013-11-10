@@ -1,5 +1,5 @@
 #include "GL/glut.h"
-#include "voronoi_diagram.h"
+#include "animated_voronoi_diagram.h"
 #include <cstdlib>
 #include <iostream>
 
@@ -8,14 +8,14 @@ using voronoi_diagram::SitesPtr;
 using voronoi_diagram::SitesConstPtr;
 using voronoi_diagram::SitePtr;
 using voronoi_diagram::Site;
-using voronoi_diagram::VoronoiDiagram;
+using voronoi_diagram::AnimatedVoronoiDiagram;
 
 int WindowWidth = 320;
 int WindowHeight = 320;
 
 float g_diagram_width = 200.0f, g_diagram_height = 200.0f;
 
-std::unique_ptr<VoronoiDiagram> diagram;
+std::unique_ptr<AnimatedVoronoiDiagram> diagram;
 
 voronoi_diagram::EdgesPtr edges;
 
@@ -101,7 +101,7 @@ int main(int argc, char** argv)
 {
 	SitesPtr sites = generateSites(10, g_diagram_width, g_diagram_height);
 
-	diagram.reset(new VoronoiDiagram(sites, g_diagram_width, g_diagram_height));
+	diagram.reset(new AnimatedVoronoiDiagram(sites, g_diagram_width, g_diagram_height));
 
 	edges = diagram->getEdges();
 

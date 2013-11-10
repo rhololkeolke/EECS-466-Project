@@ -81,6 +81,7 @@
     <ClCompile Include="voronoi_diagram.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="animated_voronoi_diagram.h" />
     <ClInclude Include="beachline_node.h" />
     <ClInclude Include="edge.h" />
     <ClInclude Include="event.h" />
