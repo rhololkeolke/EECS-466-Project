@@ -17,6 +17,8 @@ float g_diagram_width = 200.0f, g_diagram_height = 200.0f;
 
 std::unique_ptr<VoronoiDiagram> diagram;
 
+voronoi_diagram::EdgesPtr edges;
+
 SitesPtr generateSites(int num_sites, float diagram_width, float diagram_height, int seed=1)
 {
 	srand(seed);
@@ -52,6 +54,15 @@ void DisplayFunc(void)
 			site++)
 		{
 			glVertex2f((*site)->x, (*site)->y);
+		}
+	} glEnd();
+
+	glColor3f(1.0f, 1.0f, 0.0f);
+	glBegin(GL_LINES); {
+		for(voronoi_diagram::Edges::iterator edge = edges->begin(); edge != edges->end(); edge++)
+		{
+			glVertex2f((*edge)->start_->x, (*edge)->start_->y);
+			glVertex2f((*edge)->end_->x, (*edge)->end_->y);
 		}
 	} glEnd();
 
@@ -92,7 +103,7 @@ int main(int argc, char** argv)
 
 	diagram.reset(new VoronoiDiagram(sites, g_diagram_width, g_diagram_height));
 
-	voronoi_diagram::EdgesPtr edges = diagram->getEdges();
+	edges = diagram->getEdges();
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
