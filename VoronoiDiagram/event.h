@@ -11,7 +11,7 @@ namespace voronoi_diagram
 
 	enum class EventType { SITE, CIRCLE };
 
-	typedef struct Event_
+	typedef struct Event_ 
 	{
 		float y_; // sorted by this
 		EventType type_; // type of event. Either site or circle
@@ -28,10 +28,10 @@ namespace voronoi_diagram
 			site_(site)
 		{}
 
-		Event_(float y, std::shared_ptr<BeachlineNode> arc) :
-			y_(y),
+		Event_(PointPtr intersection, std::shared_ptr<BeachlineNode> arc) :
+			site_(intersection),
+			y_(intersection->y),
 			type_(EventType::CIRCLE),
-			site_(nullptr),
 			arc_(arc)
 		{}
 
@@ -45,6 +45,8 @@ namespace voronoi_diagram
 			bool operator()(const std::shared_ptr<struct Event_> l, const std::shared_ptr<struct Event_> r) const { return (l.get() == r.get()); }
 		};
 	} Event;
+
+
 
 	typedef std::shared_ptr<Event> EventPtr;
 

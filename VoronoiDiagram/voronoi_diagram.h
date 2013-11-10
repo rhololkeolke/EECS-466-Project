@@ -51,6 +51,7 @@ namespace voronoi_diagram
 		BeachlineNodePtr getArcUnderSite(SitePtr site);
 		Point getEdgePoint(BeachlineNodePtr edge, float sweep_line_pos);
 		PointPtr getArcPoint(PointPtr focus, float directrix, float x);
+		PointPtr getEdgeIntersection(EdgePtr a, EdgePtr b);
 
 	private:
 		SitesPtr sites_; // the sites that this diagram is being generated for

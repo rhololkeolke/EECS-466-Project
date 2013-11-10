@@ -15,7 +15,16 @@ namespace voronoi_diagram
 			left_(left),
 			right_(right)
 		{
-			direction_.reset(new Point(right->y - left->y, -(right->x - left->y)));
+			// calculate the direction vector components
+			// The direction is normal to the line from right to left site
+			float x = right->y - left->y;
+			float y = -(right->x - left->y);
+			// calculate the direction vector's magnitude
+			float magnitude = std::sqrtf(x*x + y*y);
+
+			// normalize the direction vector
+			direction_.reset(new Point(x/magnitude, y/magnitude));
+
 		}
 
 		PointPtr start_;

@@ -109,6 +109,7 @@ namespace voronoi_diagram
 		// convert the split_arc to an edge node
 		BeachlineNodePtr left_edge_node = split_arc;
 		left_edge_node->type_ = BeachlineNodeType::EDGE;
+		left_edge_node->edge_ = left_edge;
 		// set the left child of the new edge node to arc0
 		left_edge_node->setLeftChild(arc0);
 		// set the right child of the new edge node to a new edge node
@@ -218,25 +219,52 @@ namespace voronoi_diagram
 		checkCircleEvent(right_arc);
 	}
 
-	// TODO: implement me
 	void VoronoiDiagram::checkCircleEvent(BeachlineNodePtr arc)
 	{
 		// left_arc <- arc to the left of p
+		BeachlineNodePtr left_arc = BeachlineNode::getLeftArc(arc);
 		// right_arc <- arc to the right of p
-		// xl <- left edge of p
-		// xr <- right edge of p
+		BeachlineNodePtr right_arc = BeachlineNode::getRightArc(arc);
+
 		// if left_arc or right_arc does not exist
-			// return ( You need 3 points to have a circle event)
+		if(!left_arc)
+		{
+			return; //( You need 3 points to have a circle event)
+		}
+		if(!right_arc)
+		{
+			return; // (You need 3 points to have a circle event)
+		}
 		// if right_arc's site == left arc's site
-			// return (You need 3 points to have a circle event)
+		if(right_arc->site_.get() == left_arc->site_.get())
+		{
+			return; // (You need 3 points to have a circle event)
+		}
+
+		// xl <- left edge of p
+		BeachlineNodePtr left_edge_node = BeachlineNode::getLeftEdge(arc);
+		EdgePtr left_edge = left_edge_node->edge_;
+		// xr <- right edge of p
+		BeachlineNodePtr right_edge_node = BeachlineNode::getRightEdge(arc);
+		EdgePtr right_edge = right_edge_node->edge_;
+
 		// s <- location where xl and xr cross each other
+		PointPtr s = getEdgeIntersection(left_edge, right_edge);
 		// if s does not exist
-			// return
+		if(!s)
+			return;
+
 		// r <- distance between s and p.site (circumcircle radius)
+		float r = std::sqrt((s->x - arc->site_->x)*(s->x - arc->site_->x) + (s->y - arc->site_->y)*(s->y - arc->site_->y));
 		// if s.y + r is under the sweepline
-			// return
+		if(s->y + r)
+			return;	
+
 		// circle_event <- create new circle event with arc = p and y = s.y + r
-		// event_queue.push(circle_event)
+		EventPtr circle_event(new Event(s, arc));
+		circle_event->arc_.lock()->circle_event_ = circle_event; // TODO: Move this inside event constructor
+		// add event to the queue
+		event_queue_.push(circle_event);
 	}
 
 	BeachlineNodePtr VoronoiDiagram::getArcUnderSite(SitePtr site)
@@ -318,5 +346,40 @@ namespace voronoi_diagram
 
 		PointPtr arc_point(new Point(x, a*x*x + b*x + c));
 		return arc_point;
+	}
+
+	PointPtr VoronoiDiagram::getEdgeIntersection(EdgePtr a, EdgePtr b)
+	{
+		// edge 1 has an equation 
+		// y = m1*x + b1
+		float m1 = a->direction_->y/a->direction_->x;
+		float b1 = a->start_->y - m1*a->start_->x;
+
+		// edge 2 has an equation
+		// y = m2*x + b2
+		float m2 = b->direction_->y/b->direction_->x;
+		float b2 = b->start_->y - m2*b->start_->x;
+
+		// setting the 2 equations equal and solving for the x-coordinate of the intersection
+		float x = (b2-b1)/(m1-m2);
+		// plug the x back into one of the edge equations to get y
+		float y = m1*x + b1;
+
+		// now check that this intersection is in the direction of both of the edges
+		// otherwise they never actually intersect
+		// do this by verifying the sign of the vector from each start point to the intersection matches
+		// that edge's sign
+		if((x - a->start_->x)/a->direction_->x < 0)
+			return nullptr;
+		if((y - a->start_->y)/a->direction_->y < 0)
+			return nullptr;
+
+		if((x - b->start_->x)/b->direction_->x < 0)
+			return nullptr;
+		if((y - b->start_->y)/b->direction_->y < 0)
+			return nullptr;
+
+		PointPtr intersection(new Point(x, y));
+		return intersection;
 	}
 }
