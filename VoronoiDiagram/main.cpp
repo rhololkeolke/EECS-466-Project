@@ -90,7 +90,7 @@ int main(int argc, char** argv)
 {
 	SitesPtr sites = generateSites(10, g_diagram_width, g_diagram_height);
 
-	diagram.reset(new VoronoiDiagram(sites));
+	diagram.reset(new VoronoiDiagram(sites, g_diagram_width, g_diagram_height));
 
 	voronoi_diagram::EdgesPtr edges = diagram->getEdges();
 

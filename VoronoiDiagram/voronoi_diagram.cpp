@@ -55,7 +55,36 @@ namespace voronoi_diagram
 			}
 		}
 
-		return edges_;
+		// walk through the beachline tree and finish any unfinished edges at the edges of the diagram
+		finishEdges(beachline_);
+		beachline_.reset(); // free up the memory used in the beachline
+
+		// go through the edges and join edges with their neighbors. Remove joined edges
+		for(Edges::iterator edge = edges_->begin(); edge != edges_->end(); edge++)
+		{
+			// if this edge has been deleted
+			if(!(*edge))
+				continue;
+
+			// if this edge has a neighbor
+			if((*edge)->neighbor_)
+			{
+				(*edge)->start_ = (*edge)->neighbor_->end_;
+				(*edge)->neighbor_.reset();
+			}
+		}
+
+		// finally copy all of the remaining finalized edges
+		EdgesPtr finalized_edges(new Edges());
+		for(Edges::iterator edge = edges_->begin(); edge != edges_->end(); edge++)
+		{
+			if(!(*edge))
+				continue;
+
+			finalized_edges->push_back(*edge);
+		}
+
+		return finalized_edges;
 	}
 
 	// TODO: implement me!
@@ -381,5 +410,38 @@ namespace voronoi_diagram
 
 		PointPtr intersection(new Point(x, y));
 		return intersection;
+	}
+
+	void VoronoiDiagram::finishEdges(BeachlineNodePtr node)
+	{
+		// only finishing edges
+		// we no longer care about the arcs themselves
+		if(node->type_ == BeachlineNodeType::ARC)
+			return;
+
+		float x;
+		// if the node is travelling towards the right of the screen (positive x direction)
+		if(node->edge_->direction_->x > 0.0)
+		{
+			// cut off the node at the right edge
+			x = width_/2.0f;
+		}
+		else
+		{
+			// cut off the node at the left edge
+			x = -width_/2.0f;
+		}
+		// calculate the y position for the given x position
+		float m = node->edge_->direction_->y/node->edge_->direction_->x;
+		float b = node->edge_->start_->y - m*node->edge_->start_->x;
+		float y = m*x + b;
+
+		// set the edge's endpoint to the calculated position
+		PointPtr end(new Point(x, y));
+		node->edge_->end_ = end;
+
+		// recursively call this on the left and right subtree
+		finishEdges(node->getLeftChild());
+		finishEdges(node->getRightChild());
 	}
 }

@@ -21,8 +21,10 @@ namespace voronoi_diagram
 	{
 	public:
 
-		VoronoiDiagram(SitesPtr sites)
-			: sites_(sites)
+		VoronoiDiagram(SitesPtr sites, float width, float height)
+			: sites_(sites),
+			width_(width),
+			height_(height)
 		{}
 
 		VoronoiDiagram() :
@@ -42,6 +44,12 @@ namespace voronoi_diagram
 
 		EdgesPtr getEdges();
 
+		void setDimensions(float width, float height)
+		{
+			width_ = width;
+			height_ = height;
+		}
+
 	protected:
 		
 		void addArc(EventPtr event);
@@ -52,6 +60,7 @@ namespace voronoi_diagram
 		Point getEdgePoint(BeachlineNodePtr edge, float sweep_line_pos);
 		PointPtr getArcPoint(PointPtr focus, float directrix, float x);
 		PointPtr getEdgeIntersection(EdgePtr a, EdgePtr b);
+		void finishEdges(BeachlineNodePtr node);
 
 	private:
 		SitesPtr sites_; // the sites that this diagram is being generated for
@@ -61,6 +70,8 @@ namespace voronoi_diagram
 
 		Points points_; // points created during the algorithm's execution
 		EdgesPtr edges_; // edges created during the algorithm's execution
+
+		float width_, height_; // dimensions of the diagram
 	};
 
 }
