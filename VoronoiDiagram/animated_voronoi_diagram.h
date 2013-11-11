@@ -24,7 +24,7 @@ namespace voronoi_diagram
 	private:
 		EventPtr curr_event_;
 
-		void drawBeachlineArcs(BeachlineNodePtr arc);
+		void drawBeachlineArcs(BeachlineNodePtr arc, float line_position);
 	};
 }
 
