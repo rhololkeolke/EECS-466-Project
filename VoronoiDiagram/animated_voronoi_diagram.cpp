@@ -39,15 +39,6 @@ namespace voronoi_diagram
 			}
 		}; glEnd();
 
-		/*
-		glColor3f(1.0f, 1.0f, 0.0f);
-		glBegin(GL_LINES); {
-			for(voronoi_diagram::Edges::iterator edge = edges->begin(); edge != edges->end(); edge++)
-			{
-				glVertex2f((*edge)->start_->x, (*edge)->start_->y);
-				glVertex2f((*edge)->end_->x, (*edge)->end_->y);
-			}
-		} glEnd();*/
 
 		glutSwapBuffers();
 	}
@@ -57,9 +48,17 @@ namespace voronoi_diagram
 		if(event_queue_.empty())
 			return;
 
-		curr_event_ = event_queue_.top();
-		event_queue_.pop();
-
+		do {
+			curr_event_ = event_queue_.top();
+			event_queue_.pop();
+			if(deleted_events_.find(curr_event_) != deleted_events_.end())
+			{
+				// remove from the set of deleted events
+				deleted_events_.erase(curr_event_);
+				curr_event_.reset();
+				continue;
+			}
+		} while(!curr_event_);
 	}
 
 	void AnimatedVoronoiDiagram::restartAnimation()
