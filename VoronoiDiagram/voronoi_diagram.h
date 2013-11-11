@@ -67,7 +67,7 @@ namespace voronoi_diagram
 		
 		void addArc(EventPtr event);
 		void removeArc(EventPtr event);
-		void checkCircleEvent(BeachlineNodePtr arc);
+		void checkCircleEvent(BeachlineNodePtr arc, float sweep_line);
 
 		BeachlineNodePtr getArcUnderSite(SitePtr site);
 		Point getEdgePoint(BeachlineNodePtr edge, float sweep_line_pos);

@@ -150,9 +150,9 @@ namespace voronoi_diagram
 
 
 		// check for circle event with a in the middle
-		checkCircleEvent(arc0);
+		checkCircleEvent(arc0, event->y_);
 		// check for circle event with c in the middle
-		checkCircleEvent(arc2);
+		checkCircleEvent(arc2, event->y_);
 		// NOTE: don't check for circle event with b in the middle because a and c have the same site (need 3 sites to make a circle event)
 	}
 
@@ -243,12 +243,12 @@ namespace voronoi_diagram
 		}
 
 		// checkCircleEvent(left_arc)
-		checkCircleEvent(left_arc);
+		checkCircleEvent(left_arc, event->y_);
 		// checkCircleEvent(right_arc)
-		checkCircleEvent(right_arc);
+		checkCircleEvent(right_arc, event->y_);
 	}
 
-	void VoronoiDiagram::checkCircleEvent(BeachlineNodePtr arc)
+	void VoronoiDiagram::checkCircleEvent(BeachlineNodePtr arc, float sweep_line)
 	{
 		// left_arc <- arc to the left of p
 		BeachlineNodePtr left_arc = BeachlineNode::getLeftArc(arc);
@@ -286,7 +286,7 @@ namespace voronoi_diagram
 		// r <- distance between s and p.site (circumcircle radius)
 		float r = std::sqrt((s->x - arc->site_->x)*(s->x - arc->site_->x) + (s->y - arc->site_->y)*(s->y - arc->site_->y));
 		// if s.y + r is under the sweepline
-		if(s->y + r)
+		if(s->y - r >= sweep_line)
 			return;	
 
 		// circle_event <- create new circle event with arc = p and y = s.y + r
