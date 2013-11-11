@@ -331,6 +331,30 @@ namespace voronoi_diagram
 		BeachlineNodePtr left_arc = BeachlineNode::getLeftArc(edge);
 		BeachlineNodePtr right_arc = BeachlineNode::getRightArc(edge);
 
+		if(left_arc->site_->y == sweep_line_pos)
+		{
+			float x = left_arc->site_->x;
+			float a = right_arc->site_->x;
+			float b = right_arc->site_->y;
+			float l = sweep_line_pos;
+			float y = (a*a - 2.0f*a*x + b*b - l*l + x*x)/(2.0f*(b-l));
+
+			Point edge_point(x,y);
+			return edge_point;
+		}
+
+		if(right_arc->site_->y == sweep_line_pos)
+		{
+			float x = right_arc->site_->x;
+			float a = left_arc->site_->x;
+			float b = left_arc->site_->y;
+			float l = sweep_line_pos;
+			float y = (a*a - 2.0f*a*x + b*b - l*l + x*x)/(2.0f*(b-l));
+
+			Point edge_point(x,y);
+			return edge_point;
+		}
+
 		// just a convenince variable so I don't have to type this over and over
 		float denom1 = 2.0f*(left_arc->site_->y - sweep_line_pos);
 		// calculate the coefficients of the left arc's equation

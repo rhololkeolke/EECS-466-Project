@@ -69,6 +69,10 @@ namespace voronoi_diagram
 			{
 				addArc(curr_event_);
 			}
+			else
+			{
+				removeArc(curr_event_);
+			}
 		} while(!curr_event_);
 	}
 
@@ -110,11 +114,11 @@ namespace voronoi_diagram
 		BeachlineNodePtr left_edge = BeachlineNode::getLeftEdge(node);
 		BeachlineNodePtr right_edge = BeachlineNode::getRightEdge(node);
 
-		Point left_edge_point(-width_/2.0f, 0.0f);
+		Point left_edge_point(-width_/2.0f, height_/2.0f);
 		if(left_edge)
 			left_edge_point = VoronoiDiagram::getEdgePoint(left_edge, line_position);
 
-		Point right_edge_point(width_/2.0f, 0.0f);
+		Point right_edge_point(width_/2.0f, height_/2.0f);
 		if(right_edge)
 			right_edge_point = VoronoiDiagram::getEdgePoint(right_edge, line_position);
 
@@ -123,16 +127,26 @@ namespace voronoi_diagram
 
 		glColor3f(0, 1.0f, 0);
 		glBegin(GL_LINE_STRIP); {
-			for(int j=0; j<NUM_ARC_SAMPLES; j++)
+			// degenerate case when sweepline is on the point
+			// the arc is actually a vertical line
+			if(node->site_->y == line_position)
 			{
-				float x = j*((upper_x - lower_x)/NUM_ARC_SAMPLES) + lower_x;
-				float a = node->site_->x;
-				float b = node->site_->y;
-				float l = line_position;
+				glVertex2f(node->site_->x, left_edge_point.y);
+				glVertex2f(node->site_->x, line_position);
+			}
+			else
+			{
+				for(int j=0; j<NUM_ARC_SAMPLES; j++)
+				{
+					float x = j*((upper_x - lower_x)/NUM_ARC_SAMPLES) + lower_x;
+					float a = node->site_->x;
+					float b = node->site_->y;
+					float l = line_position;
 
-				float y = (a*a - 2.0f*a*x + b*b - l*l + x*x)/(2.0f*(b-l));
+					float y = (a*a - 2.0f*a*x + b*b - l*l + x*x)/(2.0f*(b-l));
 
-				glVertex2f(x, y);
+					glVertex2f(x, y);
+				}
 			}
 		} glEnd();
 

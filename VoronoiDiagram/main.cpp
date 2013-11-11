@@ -11,8 +11,8 @@ using voronoi_diagram::SitePtr;
 using voronoi_diagram::Site;
 using voronoi_diagram::AnimatedVoronoiDiagram;
 
-int WindowWidth = 320;
-int WindowHeight = 320;
+int WindowWidth = 640;
+int WindowHeight = 640;
 
 float g_diagram_width = 200.0f, g_diagram_height = 200.0f;
 
