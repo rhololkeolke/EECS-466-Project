@@ -60,7 +60,7 @@ namespace voronoi_diagram
 		// TODO: Stop the parabolas at the intersections
 		glColor3f(0.0f, 1.0f, 0.0f);
 		if(beachline_ && curr_event_)
-			drawBeachline(beachline_, curr_event_->site_->y);
+			drawBeachline(beachline_, curr_event_->y_);
 
 		// Draw the incomplete edges
 		if(edges_)
