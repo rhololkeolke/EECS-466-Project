@@ -28,9 +28,9 @@ namespace voronoi_diagram
 			site_(site)
 		{}
 
-		Event_(PointPtr intersection, std::shared_ptr<BeachlineNode> arc) :
+		Event_(PointPtr intersection, float y, std::shared_ptr<BeachlineNode> arc) :
 			site_(intersection),
-			y_(intersection->y),
+			y_(y),
 			type_(EventType::CIRCLE),
 			arc_(arc)
 		{}

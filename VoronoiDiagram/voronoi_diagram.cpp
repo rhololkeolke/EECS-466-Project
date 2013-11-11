@@ -163,9 +163,9 @@ namespace voronoi_diagram
 		BeachlineNodePtr middle_arc = event->arc_.lock();
 
 		// left_arc <- arc left of given arc
-		BeachlineNodePtr left_arc = BeachlineNode::getLeftArc(beachline_);
+		BeachlineNodePtr left_arc = BeachlineNode::getLeftArc(middle_arc);
 		// right_arc <- arc left of given arc
-		BeachlineNodePtr right_arc = BeachlineNode::getRightArc(beachline_);
+		BeachlineNodePtr right_arc = BeachlineNode::getRightArc(middle_arc);
 		// if left_arc has a circle event
 		if(left_arc->circle_event_)
 		{
@@ -178,11 +178,11 @@ namespace voronoi_diagram
 		{
 			// remove right_arc's circle event
 			deleted_events_.insert(right_arc->circle_event_);
-			left_arc->circle_event_.reset();
+			right_arc->circle_event_.reset();
 		}
 
 		// s <- circumcenter between left_arc's site, given arc's site and right_arc's site
-		PointPtr s = getArcPoint(middle_arc->site_, event->site_->y, event->site_->x); // TODO: Check this logic
+		PointPtr s = getArcPoint(middle_arc->site_, event->y_, event->site_->x);
 		points_.push_back(s);
 		
 		// finish the left and right edges of the arc to be removed at the circumcircle site
@@ -290,9 +290,9 @@ namespace voronoi_diagram
 		if(s->y - r >= sweep_line)
 			return;	
 
-		// circle_event <- create new circle event with arc = p and y = s.y + r
-		EventPtr circle_event(new Event(s, arc));
-		circle_event->arc_.lock()->circle_event_ = circle_event; // TODO: Move this inside event constructor
+		// circle_event <- create new circle event with arc = p and y = s.y - r
+		EventPtr circle_event(new Event(s, s->y-r, arc));
+		arc->circle_event_ = circle_event; // TODO: Move this inside event constructor
 		// add event to the queue
 		event_queue_.push(circle_event);
 	}
