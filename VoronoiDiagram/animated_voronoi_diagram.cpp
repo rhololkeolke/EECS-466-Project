@@ -43,7 +43,7 @@ namespace voronoi_diagram
 		// TODO: Stop the parabolas at the intersections
 		glColor3f(0.0f, 1.0f, 0.0f);
 		if(beachline_ && curr_event_)
-			drawBeachlineArcs(beachline_, curr_event_->site_->y);
+			drawBeachline(beachline_, curr_event_->site_->y);
 
 
 		glutSwapBuffers();
@@ -88,12 +88,20 @@ namespace voronoi_diagram
 		}
 	}
 
-	void AnimatedVoronoiDiagram::drawBeachlineArcs(BeachlineNodePtr arc, float line_position)
+	void AnimatedVoronoiDiagram::drawBeachline(BeachlineNodePtr node, float line_position)
 	{
-		if(arc->type_ != BeachlineNodeType::ARC)
+		if(node->type_ != BeachlineNodeType::ARC)
 		{
-			drawBeachlineArcs(arc->getLeftChild(), line_position);
-			drawBeachlineArcs(arc->getRightChild(), line_position);
+			Point edge_point = VoronoiDiagram::getEdgePoint(node, line_position);
+
+			glColor3f(1.0f, 1.0f, 0.0f);
+			glPointSize(4.0f);
+			glBegin(GL_POINTS); {
+				glVertex2f(edge_point.x, edge_point.y);
+			} glEnd();
+
+			drawBeachline(node->getLeftChild(), line_position);
+			drawBeachline(node->getRightChild(), line_position);
 			return;
 		}
 
@@ -104,8 +112,8 @@ namespace voronoi_diagram
 			for(int j=0; j<NUM_ARC_SAMPLES; j++)
 			{
 				float x = j*(width_/NUM_ARC_SAMPLES) + -width_/2.0f;
-				float a = arc->site_->x;
-				float b = arc->site_->y;
+				float a = node->site_->x;
+				float b = node->site_->y;
 				float l = line_position;
 
 				float y = (a*a - 2.0f*a*x + b*b - l*l + x*x)/(2.0f*(b-l));

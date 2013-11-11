@@ -336,13 +336,13 @@ namespace voronoi_diagram
 		// calculate the coefficients of the left arc's equation
 		float a1 = 1/denom1;
 		float b1 = -2.0f*left_arc->site_->x / denom1;
-		float c1 = (left_arc->site_->x*left_arc->site_->x + left_arc->site_->y*left_arc->site_->y + sweep_line_pos*sweep_line_pos) / denom1;
+		float c1 = (left_arc->site_->x*left_arc->site_->x + left_arc->site_->y*left_arc->site_->y - sweep_line_pos*sweep_line_pos) / denom1;
 
 		// now do the same thing for the right parabola
 		float denom2 = 2.0f*(right_arc->site_->y - sweep_line_pos);
 		float a2 = 1/denom2;
 		float b2 = -2.0f*right_arc->site_->x / denom2;
-		float c2 = (right_arc->site_->x*right_arc->site_->x + right_arc->site_->y*right_arc->site_->y + sweep_line_pos*sweep_line_pos) / denom2;
+		float c2 = (right_arc->site_->x*right_arc->site_->x + right_arc->site_->y*right_arc->site_->y - sweep_line_pos*sweep_line_pos) / denom2;
 
 		// now get the coefficients for the quadratic equation that we'll be solving
 		float a = a1 - a2;
