@@ -12,7 +12,7 @@ namespace voronoi_diagram
 
 		float diagram_width = VoronoiDiagram::getWidth();
 		float diagram_height = VoronoiDiagram::getHeight();
-		gluOrtho2D(-diagram_width/2.0f, diagram_width/2.0f, -diagram_height/2.0f, diagram_height/2.0f);
+		gluOrtho2D(-4*diagram_width/2.0f, 4*diagram_width/2.0f, -4*diagram_height/2.0f, 4*diagram_height/2.0f);
 
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
@@ -29,6 +29,20 @@ namespace voronoi_diagram
 			}
 		} glEnd();
 
+		glColor3f(0.0f, 0.0f, 1.0f);
+		glBegin(GL_LINES); {
+			glVertex2f(-diagram_width/2.0f, diagram_height/2.0f);
+			glVertex2f(diagram_width/2.0f, diagram_height/2.0f);
+
+			glVertex2f(-diagram_width/2.0f, -diagram_height/2.0f);
+			glVertex2f(diagram_width/2.0f, -diagram_height/2.0f);
+
+			glVertex2f(-diagram_width/2.0f, diagram_height/2.0f);
+			glVertex2f(-diagram_width/2.0f, -diagram_height/2.0f);
+
+			glVertex2f(diagram_width/2.0f, diagram_height/2.0f);
+			glVertex2f(diagram_width/2.0f, -diagram_height/2.0f);
+		} glEnd();
 		// draw a red line at the sweepline position
 		glColor3f(1.0f, 0.0f, 0.0f);
 		glBegin(GL_LINES); {
