@@ -107,11 +107,25 @@ namespace voronoi_diagram
 
 		const int NUM_ARC_SAMPLES=100;
 
+		BeachlineNodePtr left_edge = BeachlineNode::getLeftEdge(node);
+		BeachlineNodePtr right_edge = BeachlineNode::getRightEdge(node);
+
+		Point left_edge_point(-width_/2.0f, 0.0f);
+		if(left_edge)
+			left_edge_point = VoronoiDiagram::getEdgePoint(left_edge, line_position);
+
+		Point right_edge_point(width_/2.0f, 0.0f);
+		if(right_edge)
+			right_edge_point = VoronoiDiagram::getEdgePoint(right_edge, line_position);
+
+		float lower_x = left_edge_point.x;
+		float upper_x = right_edge_point.x;
+
 		glColor3f(0, 1.0f, 0);
 		glBegin(GL_LINE_STRIP); {
 			for(int j=0; j<NUM_ARC_SAMPLES; j++)
 			{
-				float x = j*(width_/NUM_ARC_SAMPLES) + -width_/2.0f;
+				float x = j*((upper_x - lower_x)/NUM_ARC_SAMPLES) + lower_x;
 				float a = node->site_->x;
 				float b = node->site_->y;
 				float l = line_position;
