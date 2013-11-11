@@ -43,6 +43,9 @@ namespace voronoi_diagram
 			glVertex2f(diagram_width/2.0f, diagram_height/2.0f);
 			glVertex2f(diagram_width/2.0f, -diagram_height/2.0f);
 		} glEnd();
+
+	
+
 		// draw a red line at the sweepline position
 		glColor3f(1.0f, 0.0f, 0.0f);
 		glBegin(GL_LINES); {
@@ -59,6 +62,24 @@ namespace voronoi_diagram
 		if(beachline_ && curr_event_)
 			drawBeachline(beachline_, curr_event_->site_->y);
 
+		// Draw the incomplete edges
+		if(edges_)
+		{
+			glColor3f(1.0f, 0.0f, 1.0f);
+			glBegin(GL_LINES); {
+				for(Edges::iterator edge = edges_->begin();
+					edge != edges_->end();
+					edge++)
+				{
+					if(!(*edge)->end_)
+						continue;
+					glVertex2f((*edge)->start_->x, (*edge)->start_->y);
+					glVertex2f((*edge)->end_->x, (*edge)->end_->y);
+					glVertex2f((*edge)->neighbor_->start_->x, (*edge)->neighbor_->start_->y);
+					glVertex2f((*edge)->neighbor_->end_->x, (*edge)->neighbor_->end_->y);
+				}
+			} glEnd();
+		}
 
 		glutSwapBuffers();
 	}
@@ -117,6 +138,8 @@ namespace voronoi_diagram
 			glBegin(GL_POINTS); {
 				glVertex2f(edge_point.x, edge_point.y);
 			} glEnd();
+
+			node->edge_->end_.reset(new Point(edge_point.x, edge_point.y));
 
 			drawBeachline(node->getLeftChild(), line_position);
 			drawBeachline(node->getRightChild(), line_position);

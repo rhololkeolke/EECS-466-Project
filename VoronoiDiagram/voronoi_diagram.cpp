@@ -119,7 +119,7 @@ namespace voronoi_diagram
 		EdgePtr left_edge(new Edge(start_point, split_arc->site_, event->site_));
 		EdgePtr right_edge(new Edge(start_point, event->site_, split_arc->site_));
 
-		// the left edge points to the right edeg
+		// the left edge points to the right edge
 		// this allows for the different edge segments to be joined after the algorithm is complete
 		left_edge->neighbor_ = right_edge;
 
@@ -395,7 +395,7 @@ namespace voronoi_diagram
 		double denom = 2 * (focus->y - directrix);
 		double a = 1.0f / denom;
 		double b = -2.0f * focus->x / denom;
-		double c = (focus->x*focus->x + focus->y*focus->y + directrix*directrix)/ denom;
+		double c = (focus->x*focus->x + focus->y*focus->y - directrix*directrix)/ denom;
 
 		PointPtr arc_point(new Point(x, a*x*x + b*x + c));
 		return arc_point;
