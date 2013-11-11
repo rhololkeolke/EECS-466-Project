@@ -205,6 +205,7 @@ namespace voronoi_diagram
 				highest_edge = left_edge;
 			if(curr_node.get() == right_edge.get())
 				highest_edge = right_edge;
+			curr_node = curr_node->getParent();
 		}
 		highest_edge->edge_ = new_edge;
 

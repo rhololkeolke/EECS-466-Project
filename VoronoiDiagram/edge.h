@@ -18,12 +18,14 @@ namespace voronoi_diagram
 			// calculate the direction vector components
 			// The direction is normal to the line from right to left site
 			float x = right->y - left->y;
-			float y = -(right->x - left->y);
+			float y = -(right->x - left->x);
 			// calculate the direction vector's magnitude
 			float magnitude = std::sqrtf(x*x + y*y);
 
 			// normalize the direction vector
 			direction_.reset(new Point(x/magnitude, y/magnitude));
+
+
 
 		}
 
@@ -33,6 +35,8 @@ namespace voronoi_diagram
 
 		SitePtr left_;
 		SitePtr right_;
+
+		//double f_, g_;
 
 		std::shared_ptr<Edge_> neighbor_;
 	} Edge;

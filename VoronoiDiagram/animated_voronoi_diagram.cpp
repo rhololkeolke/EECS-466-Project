@@ -63,7 +63,7 @@ namespace voronoi_diagram
 			drawBeachline(beachline_, curr_event_->site_->y);
 
 		// Draw the incomplete edges
-		if(edges_)
+		/*if(edges_)
 		{
 			glColor3f(1.0f, 0.0f, 1.0f);
 			glBegin(GL_LINES); {
@@ -75,19 +75,19 @@ namespace voronoi_diagram
 						continue;
 					glVertex2f((*edge)->start_->x, (*edge)->start_->y);
 					glVertex2f((*edge)->end_->x, (*edge)->end_->y);
+					if(!(*edge)->neighbor_)
+						continue;
 					glVertex2f((*edge)->neighbor_->start_->x, (*edge)->neighbor_->start_->y);
 					glVertex2f((*edge)->neighbor_->end_->x, (*edge)->neighbor_->end_->y);
 				}
 			} glEnd();
-		}
+		}*/
 
 		glutSwapBuffers();
 	}
 
 	void AnimatedVoronoiDiagram::nextEvent()
 	{
-		if(event_queue_.empty())
-			return;
 
 		do {
 			curr_event_ = event_queue_.top();
@@ -108,7 +108,7 @@ namespace voronoi_diagram
 			{
 				removeArc(curr_event_);
 			}
-		} while(!curr_event_);
+		} while(!curr_event_ && event_queue_.empty());
 	}
 
 	void AnimatedVoronoiDiagram::restartAnimation()
