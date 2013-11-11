@@ -37,7 +37,13 @@ namespace voronoi_diagram
 				glVertex2f(-diagram_width/2.0f, curr_event_->y_);
 				glVertex2f(diagram_width/2.0f, curr_event_->y_);
 			}
-		}; glEnd();
+		} glEnd();
+
+		// draw the beachline in green
+		// TODO: Stop the parabolas at the intersections
+		glColor3f(0.0f, 1.0f, 0.0f);
+		if(beachline_)
+			drawBeachlineArcs(beachline_);
 
 
 		glutSwapBuffers();
@@ -58,6 +64,11 @@ namespace voronoi_diagram
 				curr_event_.reset();
 				continue;
 			}
+
+			if(curr_event_->type_ == EventType::SITE)
+			{
+				addArc(curr_event_);
+			}
 		} while(!curr_event_);
 	}
 
@@ -75,5 +86,33 @@ namespace voronoi_diagram
 			EventPtr site_event(new Event(*site));
 			event_queue_.push(site_event);
 		}
+	}
+
+	void AnimatedVoronoiDiagram::drawBeachlineArcs(BeachlineNodePtr arc)
+	{
+		if(arc->type_ != BeachlineNodeType::ARC)
+		{
+			drawBeachlineArcs(arc->getLeftChild());
+			drawBeachlineArcs(arc->getRightChild());
+			return;
+		}
+
+		const int NUM_ARC_SAMPLES=100;
+
+		glColor3f(0, 1.0f, 0);
+		glBegin(GL_LINE_STRIP); {
+			for(int j=0; j<NUM_ARC_SAMPLES; j++)
+			{
+				float x = j*(width_/NUM_ARC_SAMPLES) + -width_/2.0f;
+				float a = arc->site_->x;
+				float b = arc->site_->y;
+				float l = curr_event_->site_->y;
+
+				float y = (a*a - 2.0f*a*x + b*b - l*l + x*x)/(2.0f*(b-l));
+
+				glVertex2f(x, y);
+			}
+		} glEnd();
+
 	}
 }
