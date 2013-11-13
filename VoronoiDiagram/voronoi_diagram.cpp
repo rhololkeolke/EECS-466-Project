@@ -56,7 +56,7 @@ namespace voronoi_diagram
 		}
 
 		// walk through the beachline tree and finish any unfinished edges at the edges of the diagram
-		finishEdges(beachline_);
+		finishEdges(beachline_, width_, height_);
 		beachline_.reset(); // free up the memory used in the beachline
 
 		// go through the edges and join edges with their neighbors. Remove joined edges
@@ -438,7 +438,7 @@ namespace voronoi_diagram
 		return intersection;
 	}
 
-	void VoronoiDiagram::finishEdges(BeachlineNodePtr node)
+	void VoronoiDiagram::finishEdges(BeachlineNodePtr node, float width, float height)
 	{
 		// only finishing edges
 		// we no longer care about the arcs themselves
@@ -450,12 +450,12 @@ namespace voronoi_diagram
 		if(node->edge_->direction_->x > 0.0)
 		{
 			// cut off the node at the right edge
-			x = width_/2.0f;
+			x = width/2.0f;
 		}
 		else
 		{
 			// cut off the node at the left edge
-			x = -width_/2.0f;
+			x = -width/2.0f;
 		}
 		// calculate the y position for the given x position
 		float m = node->edge_->direction_->y/node->edge_->direction_->x;
@@ -467,7 +467,7 @@ namespace voronoi_diagram
 		node->edge_->end_ = end;
 
 		// recursively call this on the left and right subtree
-		finishEdges(node->getLeftChild());
-		finishEdges(node->getRightChild());
+		finishEdges(node->getLeftChild(), width, height);
+		finishEdges(node->getRightChild(), width, height);
 	}
 }

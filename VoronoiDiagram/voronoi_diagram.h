@@ -73,7 +73,7 @@ namespace voronoi_diagram
 		Point getEdgePoint(BeachlineNodePtr edge, float sweep_line_pos);
 		PointPtr getArcPoint(PointPtr focus, float directrix, float x);
 		PointPtr getEdgeIntersection(EdgePtr a, EdgePtr b);
-		void finishEdges(BeachlineNodePtr node);
+		void finishEdges(BeachlineNodePtr node, float width, float height);
 
 		SitesPtr sites_; // the sites that this diagram is being generated for
 		BeachlineNodePtr beachline_; // Holds the representation of the beachline used during calculation

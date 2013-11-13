@@ -71,6 +71,15 @@ void KeyboardFunc(unsigned char key, int x, int y)
 	case 't':
 		// printf("Generating new points");
 		break;
+	case '+':
+		printf("%3.3f x %3.3f\n", diagram->getViewWidth(), diagram->getViewHeight());
+		diagram->setViewWidth(diagram->getViewWidth()*.9);
+		diagram->setViewHeight(diagram->getViewHeight()*.9);
+		break;
+	case '-':
+		diagram->setViewWidth(diagram->getViewWidth()*1.1);
+		diagram->setViewHeight(diagram->getViewHeight()*1.1);
+		break;
 	}
 	glutPostRedisplay();
 }

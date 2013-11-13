@@ -3,6 +3,8 @@
 
 namespace voronoi_diagram
 {
+
+
 	void AnimatedVoronoiDiagram::display()
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -12,7 +14,7 @@ namespace voronoi_diagram
 
 		float diagram_width = VoronoiDiagram::getWidth();
 		float diagram_height = VoronoiDiagram::getHeight();
-		gluOrtho2D(-4*diagram_width/2.0f, 4*diagram_width/2.0f, -4*diagram_height/2.0f, 4*diagram_height/2.0f);
+		gluOrtho2D(-view_width_/2.0f, view_width_/2.0f, -view_height_/2.0f, view_height_/2.0f);
 
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
@@ -51,8 +53,8 @@ namespace voronoi_diagram
 		glBegin(GL_LINES); {
 			if(curr_event_)
 			{
-				glVertex2f(-diagram_width/2.0f, curr_event_->y_);
-				glVertex2f(diagram_width/2.0f, curr_event_->y_);
+				glVertex2f(-view_width_/2.0f, curr_event_->y_);
+				glVertex2f(view_width_/2.0f, curr_event_->y_);
 			}
 		} glEnd();
 
@@ -86,6 +88,18 @@ namespace voronoi_diagram
 		glutSwapBuffers();
 	}
 
+	void AnimatedVoronoiDiagram::setViewWidth(float width)
+	{
+		view_width_ = width;
+		glutPostRedisplay();
+	}
+
+	void AnimatedVoronoiDiagram::setViewHeight(float height)
+	{
+		view_height_ = height;
+		glutPostRedisplay();
+	}
+
 	void AnimatedVoronoiDiagram::nextEvent()
 	{
 		curr_event_.reset();
@@ -115,7 +129,7 @@ namespace voronoi_diagram
 
 		if(!curr_event_)
 		{
-			VoronoiDiagram::finishEdges(beachline_);
+			VoronoiDiagram::finishEdges(beachline_, view_width_, view_height_);
 			beachline_.reset();
 
 		}
@@ -161,11 +175,11 @@ namespace voronoi_diagram
 		BeachlineNodePtr left_edge = BeachlineNode::getLeftEdge(node);
 		BeachlineNodePtr right_edge = BeachlineNode::getRightEdge(node);
 
-		Point left_edge_point(-width_/2.0f, height_/2.0f);
+		Point left_edge_point(-view_width_/2.0f, view_height_/2.0f);
 		if(left_edge)
 			left_edge_point = VoronoiDiagram::getEdgePoint(left_edge, line_position);
 
-		Point right_edge_point(width_/2.0f, height_/2.0f);
+		Point right_edge_point(view_width_/2.0f, view_height_/2.0f);
 		if(right_edge)
 			right_edge_point = VoronoiDiagram::getEdgePoint(right_edge, line_position);
 
