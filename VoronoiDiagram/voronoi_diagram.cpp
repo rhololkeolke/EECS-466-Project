@@ -105,6 +105,7 @@ namespace voronoi_diagram
 		{
 			// mark the circle event for deletion
 			deleted_events_.insert(split_arc->circle_event_);
+			split_arc->circle_event_.reset();
 		}
 
 		// start a new edge at this point

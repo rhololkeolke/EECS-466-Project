@@ -14,7 +14,7 @@ using voronoi_diagram::AnimatedVoronoiDiagram;
 int WindowWidth = 640;
 int WindowHeight = 640;
 
-float g_diagram_width = 200.0f, g_diagram_height = 200.0f;
+float g_diagram_width = 1000.0f, g_diagram_height = 1000.0f;
 
 std::unique_ptr<AnimatedVoronoiDiagram> diagram;
 
@@ -41,7 +41,7 @@ void DisplayFunc(void)
 
 void MouseFunc(int button,int state,int x,int y)
 {
-
+	
 }
 
 void MotionFunc(int x, int y)
@@ -66,6 +66,10 @@ void KeyboardFunc(unsigned char key, int x, int y)
 	case 'r':
 		printf("restarting animation\n");
 		diagram->restartAnimation();
+		break;
+	case 'T':
+	case 't':
+		// printf("Generating new points");
 		break;
 	}
 	glutPostRedisplay();
