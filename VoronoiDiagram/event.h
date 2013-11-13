@@ -39,11 +39,6 @@ namespace voronoi_diagram
 		{
 			bool operator()(const std::shared_ptr<struct Event_> l, const std::shared_ptr<struct Event_> r) const { return (l->y_ < r->y_); }
 		};
-
-		struct EqualEvent : public std::binary_function<std::shared_ptr<struct Event_>, std::shared_ptr<struct Event_>, bool>
-		{
-			bool operator()(const std::shared_ptr<struct Event_> l, const std::shared_ptr<struct Event_> r) const { return (l.get() == r.get()); }
-		};
 	} Event;
 
 
