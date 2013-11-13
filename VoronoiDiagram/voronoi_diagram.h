@@ -79,7 +79,7 @@ namespace voronoi_diagram
 		BeachlineNodePtr beachline_; // Holds the representation of the beachline used during calculation
 
 		EventQueue event_queue_; // Holds the 2 types of events sorted by y coordinate
-		std::set<EventPtr, Event::EqualEvent> deleted_events_; // holds events that should be deleted when popped instead of executed
+		std::set<EventPtr, Event::CompareEvent> deleted_events_; // holds events that should be deleted when popped instead of executed
 
 		Points points_; // points created during the algorithm's execution
 		EdgesPtr edges_; // edges created during the algorithm's execution

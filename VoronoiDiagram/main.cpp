@@ -14,7 +14,7 @@ using voronoi_diagram::AnimatedVoronoiDiagram;
 int WindowWidth = 640;
 int WindowHeight = 640;
 
-float g_diagram_width = 1000.0f, g_diagram_height = 1000.0f;
+float g_diagram_width = 200.0f, g_diagram_height = 200.0f;
 
 std::unique_ptr<AnimatedVoronoiDiagram> diagram;
 
@@ -84,7 +84,7 @@ void ReshapeFunc(int x,int y)
 
 int main(int argc, char** argv)
 {
-	SitesPtr sites = generateSites(10, g_diagram_width, g_diagram_height);
+	SitesPtr sites = generateSites(30, g_diagram_width, g_diagram_height);
 
 	diagram.reset(new AnimatedVoronoiDiagram(sites, g_diagram_width, g_diagram_height));
 

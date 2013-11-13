@@ -95,13 +95,13 @@ namespace voronoi_diagram
 			curr_event_ = event_queue_.top();
 			event_queue_.pop();
 			printf("Number of deleted events: %d\n", deleted_events_.size());
-			/*if(deleted_events_.find(curr_event_) != deleted_events_.end())
+			if(deleted_events_.find(curr_event_) != deleted_events_.end())
 			{
 				// remove from the set of deleted events
 				deleted_events_.erase(curr_event_);
 				curr_event_.reset();
 				continue;
-			}*/
+			}
 
 			if(curr_event_->type_ == EventType::SITE)
 			{
