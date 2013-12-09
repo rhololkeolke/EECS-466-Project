@@ -32,3 +32,6 @@ target_link_libraries(animated_voronoi_diagram_example ${LIBS} voronoi_diagram)
 
 add_executable(voronoi_and_delaunay src/voronoi_and_delaunay.cpp)
 target_link_libraries(voronoi_and_delaunay ${LIBS} voronoi_diagram)
+
+add_executable(terrain_mesh_reconstruction src/terrain_mesh_reconstruction.cpp)
+target_link_libraries(terrain_mesh_reconstruction ${LIBS} voronoi_diagram)
