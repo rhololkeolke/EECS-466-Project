@@ -1,4 +1,5 @@
 #include "voronoi_diagram.h"
+#include <cfloat>
 
 namespace voronoi_diagram
 {
@@ -532,3 +533,4 @@ namespace voronoi_diagram
 		finishEdges(node->getRightChild(), width, height);
 	}
 }
+
