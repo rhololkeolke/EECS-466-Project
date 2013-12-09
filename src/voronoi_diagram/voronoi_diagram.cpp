@@ -456,38 +456,46 @@ namespace voronoi_diagram
 		return arc_point;
 	}
 
-	PointPtr VoronoiDiagram::getEdgeIntersection(EdgePtr a, EdgePtr b)
+	PointPtr VoronoiDiagram::getEdgeIntersection(EdgePtr left, EdgePtr right)
 	{
-		// edge 1 has an equation 
-		// y = m1*x + b1
-		float m1 = a->direction_->y/a->direction_->x;
-		float b1 = a->start_->y - m1*a->start_->x;
+		// these are temp variables that match
+		// the algebra letters I used when I derived this on paper
+		float ax = left->start_->x;
+		float ay = left->start_->y;
 
-		// edge 2 has an equation
-		// y = m2*x + b2
-		float m2 = b->direction_->y/b->direction_->x;
-		float b2 = b->start_->y - m2*b->start_->x;
+		float bx = left->direction_->x;
+		float by = left->direction_->y;
 
-		// setting the 2 equations equal and solving for the x-coordinate of the intersection
-		float x = (b2-b1)/(m1-m2);
-		// plug the x back into one of the edge equations to get y
-		float y = m1*x + b1;
+		float cx = right->start_->x;
+		float cy = right->start_->y;
 
-		// now check that this intersection is in the direction of both of the edges
-		// otherwise they never actually intersect
-		// do this by verifying the sign of the vector from each start point to the intersection matches
-		// that edge's sign
-		if((x - a->start_->x)/a->direction_->x < 0)
-			return nullptr;
-		if((y - a->start_->y)/a->direction_->y < 0)
+		float dx = right->direction_->x;
+		float dy = right->direction_->y;
+
+		// if u_denom is 0 then the lines are parallel
+		float u_denom = (dx*by - dy*bx);
+		if(u_denom == 0)
 			return nullptr;
 
-		if((x - b->start_->x)/b->direction_->x < 0)
-			return nullptr;
-		if((y - b->start_->y)/b->direction_->y < 0)
+		// if t_denom is 0 then the lines are parallel
+		// probably don't have to check this since u_denom
+		// is being checked but this can't hurt
+		float t_denom = (bx*dy - by*dx);
+		if(t_denom == 0)
 			return nullptr;
 
-		PointPtr intersection(new Point(x, y));
+		// now actually calculate the parameters
+		// u goes with right and t goes with left
+		float u = (bx*(cy-ay) + by*(ax - cx))/u_denom;
+		float t = (dx*(ay-cy) + dy*(cx - ax))/t_denom;
+
+		// if the intersection occurred in the reverse line direction
+		// then no new intersections found
+		if(u < 0 || t < 0)
+			return nullptr;
+
+		PointPtr intersection(new Point(left->start_->x + t*left->direction_->x,
+			left->start_->y + t*left->direction_->y));
 		return intersection;
 	}
 
