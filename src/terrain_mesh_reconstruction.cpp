@@ -9,6 +9,8 @@
 #include <vector>
 #include <string>
 
+#define PI 3.14159265359
+
 using namespace voronoi_diagram;
 
 bool g_show_delaunay = true;
@@ -16,6 +18,11 @@ bool g_show_voronoi = true;
 
 int WindowWidth = 640;
 int WindowHeight = 640;
+
+int MouseX = 0;
+int MouseY = 0;
+bool MouseLeft = false;
+bool MouseRight = false;
 
 std::unique_ptr<VoronoiDiagram> diagram;
 
@@ -178,12 +185,39 @@ void DisplayFunc(void)
 
 void MouseFunc(int button, int state, int x, int y)
 {
+	MouseX = x;
+	MouseY = y;
 
+	if(button == GLUT_LEFT_BUTTON)
+		MouseLeft = !(bool) state;
+	if(button == GLUT_RIGHT_BUTTON)
+		MouseRight = !(bool) state;
 }
 
 void MotionFunc(int x, int y)
 {
 
+	if(MouseLeft)
+	{
+		g_camera.theta += 0.01*PI*(MouseX - x);
+		g_camera.phi += 0.01*PI*(MouseY - y);
+		if(g_camera.phi > (PI - 0.01))
+			g_camera.phi = PI - 0.01;
+		if(g_camera.phi < 0.01)
+			g_camera.phi = 0.01;
+	}
+
+	if(MouseRight)
+	{
+		g_camera.radius += 0.2*(MouseY - y);
+		if(g_camera.radius <= 0)
+			g_camera.radius = 0.2;
+	}
+
+	MouseX = x;
+	MouseY = y;
+
+	glutPostRedisplay();
 }
 
 void KeyboardFunc(unsigned char key, int x, int y)
