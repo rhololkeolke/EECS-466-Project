@@ -30,7 +30,15 @@ typedef struct TerrainData_
 	float min_z, max_z;
 } TerrainData;
 
+typedef struct Camera_
+{
+	float radius;
+	float phi;
+	float theta;
+} Camera;
+
 TerrainData g_terrain_data;
+Camera g_camera;
 
 void readTerrainData(std::string filename, TerrainData& data, int line_skip=1)
 {
@@ -111,7 +119,14 @@ void DisplayFunc(void)
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
-	gluOrtho2D(-diagram->getWidth()/2.0f, diagram->getWidth()/2.0f, -diagram->getHeight()/2.0f, diagram->getHeight()/2.0f);
+	//gluOrtho2D(-diagram->getWidth()/2.0f, diagram->getWidth()/2.0f, -diagram->getHeight()/2.0f, diagram->getHeight()/2.0f);
+	gluPerspective(60.0, 1.0, .01, 10000.0);
+
+	gluLookAt(g_camera.radius*cos(g_camera.theta)*sin(g_camera.phi),
+			  g_camera.radius*cos(g_camera.phi),
+			  g_camera.radius*sin(g_camera.theta)*sin(g_camera.phi),
+			  0.0, 0.0, 0.0,
+			  0.0, 1.0, 0.0);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -119,12 +134,9 @@ void DisplayFunc(void)
 	glPointSize(4.0f);
 	glColor3f(1.0f, 1.0f, 1.0f);
 	glBegin(GL_POINTS); {
-		for(Sites::const_iterator site = g_terrain_data.sites->begin();
-			site != g_terrain_data.sites->end();
-			site++)
+		for(int i=0; i<(int)g_terrain_data.sites->size(); i++)
 		{
-			//printf("Drawing point (%3.3f, %3.3f)\n", (*site)->x, (*site)->y);
-			glVertex2f((*site)->x, (*site)->y);
+			glVertex3f((*g_terrain_data.sites)[i]->x, (*g_terrain_data.sites)[i]->y, g_terrain_data.heights[i]);
 		}
 
 	} glEnd();
@@ -194,14 +206,10 @@ void KeyboardFunc(unsigned char key, int x, int y)
 		edges = diagram->getEdges();
 		break;*/
 	case '+':
-		diagram->setDimensions(diagram_width*.9, diagram_height*.9);
-		edges = diagram->getEdges();
-		printf("%3.3f x %3.3f\n", diagram_width, diagram_height);
+		g_camera.radius *= .9f;
 		break;
 	case '-':
-		diagram->setDimensions(diagram_width*1.1, diagram_height*1.1);
-		edges = diagram->getEdges();
-		printf("%3.3f x %3.3f\n", diagram_width, diagram_height);
+		g_camera.radius *= 1.1f;
 		break;
 	case 'D':
 	case 'd':
@@ -237,6 +245,10 @@ void ReshapeFunc(int x, int y)
 
 int main(int argc, char** argv)
 {
+	g_camera.radius = 1000.0f;
+	g_camera.phi = 1.57;
+	g_camera.theta = 1.57;
+
 	/*	float init_diagram_width = 200.0f;
 	float init_diagram_height = 200.0f;
 	SitesPtr sites = generateSites(30, init_diagram_width, init_diagram_height);
