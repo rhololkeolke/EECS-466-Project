@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VoronoiDiagram", "VoronoiDiagram\VoronoiDiagram.vcxproj", "{9827B672-A749-4003-BEE8-23AEA36B0033}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VoronoiDiagram", "voronoi_diagram\VoronoiDiagram.vcxproj", "{9827B672-A749-4003-BEE8-23AEA36B0033}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
