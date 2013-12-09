@@ -29,3 +29,6 @@ target_link_libraries(voronoi_diagram ${LIBS})
 
 add_executable(animated_voronoi_diagram_example src/voronoi_diagram/main.cpp)
 target_link_libraries(animated_voronoi_diagram_example ${LIBS} voronoi_diagram)
+
+add_executable(voronoi_and_delaunay src/voronoi_and_delaunay.cpp)
+target_link_libraries(voronoi_and_delaunay ${LIBS} voronoi_diagram)
