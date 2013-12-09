@@ -399,6 +399,16 @@ namespace voronoi_diagram
 		float b1 = -2.0f*left_arc->site_->x / denom1;
 		float c1 = (left_arc->site_->x*left_arc->site_->x + left_arc->site_->y*left_arc->site_->y - sweep_line_pos*sweep_line_pos) / denom1;
 
+		// degenerate case
+		if(left_arc->site_->y == right_arc->site_->y)
+		{
+			float x = (right_arc->site_->x - left_arc->site_->x)/2.0f + left_arc->site_->x;
+			float y = a1*x*x + b1*x + c1;
+
+			Point edge_point(x, y);
+			return edge_point;
+		}
+
 		// now do the same thing for the right parabola
 		float denom2 = 2.0f*(right_arc->site_->y - sweep_line_pos);
 		float a2 = 1/denom2;
@@ -407,6 +417,7 @@ namespace voronoi_diagram
 
 		// now get the coefficients for the quadratic equation that we'll be solving
 		float a = a1 - a2;
+
 		float b = b1 - b2;
 		float c = c1 - c2;
 
