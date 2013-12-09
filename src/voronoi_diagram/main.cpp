@@ -15,6 +15,8 @@ using voronoi_diagram::AnimatedVoronoiDiagram;
 int WindowWidth = 640;
 int WindowHeight = 640;
 
+int seed = 1;
+
 float g_diagram_width = 200.0f, g_diagram_height = 200.0f;
 
 std::unique_ptr<AnimatedVoronoiDiagram> diagram;
@@ -113,6 +115,7 @@ void MotionFunc(int x, int y)
 
 void KeyboardFunc(unsigned char key, int x, int y)
 {
+	SitesPtr sites;
 	switch(key)
 	{
 	case 'Q':
@@ -132,7 +135,10 @@ void KeyboardFunc(unsigned char key, int x, int y)
 		break;
 	case 'T':
 	case 't':
-		// printf("Generating new points");
+		printf("Generating new points with seed %d\n", ++seed);
+		sites = generateSites(100, g_diagram_width, g_diagram_height, seed);
+		diagram.reset(new AnimatedVoronoiDiagram(sites, g_diagram_width, g_diagram_height));
+		diagram->restartAnimation();
 		break;
 	case '+':
 		printf("%3.3f x %3.3f\n", diagram->getViewWidth(), diagram->getViewHeight());
