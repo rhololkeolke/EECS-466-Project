@@ -2,13 +2,15 @@
 #include <voronoi_diagram.h>
 #include <cstdlib>
 #include <cstdio>
+#include <ctime>
 
 using namespace voronoi_diagram;
 
+bool g_show_delaunay = true;
+bool g_show_voronoi = true;
+
 int WindowWidth = 640;
 int WindowHeight = 640;
-
-float g_diagram_width = 200.0f, g_diagram_height = 200.0f;
 
 std::unique_ptr<VoronoiDiagram> diagram;
 
@@ -55,17 +57,34 @@ void DisplayFunc(void)
 		}
 	} glEnd();
 
-	// draw the edges
-	glColor3f(1.0f, 0.0f, 0.0f);
-	glBegin(GL_LINES); {
-		for(Edges::iterator edge = edges->begin();
-			edge != edges->end();
-			edge++)
-		{
-			glVertex2f((*edge)->start_->x, (*edge)->start_->y);
-			glVertex2f((*edge)->end_->x, (*edge)->end_->y);
-		}
-	} glEnd();
+	if(g_show_voronoi)
+	{
+		// draw the edges
+		glColor3f(1.0f, 0.0f, 0.0f);
+		glBegin(GL_LINES); {
+			for(Edges::iterator edge = edges->begin();
+				edge != edges->end();
+				edge++)
+			{
+				glVertex2f((*edge)->start_->x, (*edge)->start_->y);
+				glVertex2f((*edge)->end_->x, (*edge)->end_->y);
+			}
+		} glEnd();
+	}
+
+	if(g_show_delaunay)
+	{
+		glColor3f(0.0f, 0.0f, 1.0f);
+		glBegin(GL_LINES); {
+			for(Edges::iterator edge = edges->begin();
+				edge != edges->end();
+				edge++)
+			{
+				glVertex2f((*edge)->left_->x, (*edge)->left_->y);
+				glVertex2f((*edge)->right_->x, (*edge)->right_->y);
+			}
+		} glEnd();
+	}
 
 	glutSwapBuffers();
 }
@@ -82,6 +101,9 @@ void MotionFunc(int x, int y)
 
 void KeyboardFunc(unsigned char key, int x, int y)
 {
+	SitesPtr sites;
+	float diagram_width = diagram->getWidth();
+	float diagram_height = diagram->getHeight();
 	switch(key)
 	{
 	case 'Q':
@@ -89,27 +111,38 @@ void KeyboardFunc(unsigned char key, int x, int y)
 	case 27:
 		exit(0);
 		break;
-	case 'T':
+		/*	case 'T':
 	case 't':
-		printf("Generated new points\n");
-		break;
-	case '+':
-		diagram->setDimensions(diagram->getWidth()*.9, diagram->getHeight()*.9);
+		printf("generating new sites\n");
+		sites = generateSites(30, diagram_width, diagram_height, time(NULL));
+		diagram.reset(new VoronoiDiagram(sites, diagram_width, diagram_height));
 		edges = diagram->getEdges();
-		printf("%3.3f x %3.3f\n", diagram->getWidth(), diagram->getHeight());
+		break;*/
+	case '+':
+		diagram->setDimensions(diagram_width*.9, diagram_height*.9);
+		edges = diagram->getEdges();
+		printf("%3.3f x %3.3f\n", diagram_width, diagram_height);
 		break;
 	case '-':
-		diagram->setDimensions(diagram->getWidth()*1.1, diagram->getHeight()*1.1);
+		diagram->setDimensions(diagram_width*1.1, diagram_height*1.1);
 		edges = diagram->getEdges();
-		printf("%3.3f x %3.3f\n", diagram->getWidth(), diagram->getHeight());
+		printf("%3.3f x %3.3f\n", diagram_width, diagram_height);
 		break;
 	case 'D':
 	case 'd':
-		printf("Toggling Delaunay Triangulation\n");
+		g_show_delaunay = !g_show_delaunay;
+		if(g_show_delaunay)
+			printf("Showing delaunay triangulation\n");
+		else
+			printf("Not showing delaunay triangulation\n");
 		break;
 	case 'V':
 	case 'v':
-		printf("Toggling Voronoi Diagram\n");
+		g_show_voronoi = !g_show_voronoi;
+		if(g_show_voronoi)
+			printf("Showing voronoi diagram\n");
+		else
+			printf("Not showing voronoi diagram\n");
 		break;
 	}
 
@@ -125,9 +158,11 @@ void ReshapeFunc(int x, int y)
 
 int main(int argc, char** argv)
 {
-	SitesPtr sites = generateSites(30, g_diagram_width, g_diagram_height);
+	float init_diagram_width = 200.0f;
+	float init_diagram_height = 200.0f;
+	SitesPtr sites = generateSites(30, init_diagram_width, init_diagram_height);
 
-	diagram.reset(new VoronoiDiagram(sites, g_diagram_width, g_diagram_height));
+	diagram.reset(new VoronoiDiagram(sites, init_diagram_width, init_diagram_height));
 
 	edges = diagram->getEdges();
 
