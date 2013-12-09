@@ -17,7 +17,7 @@ bool g_show_voronoi = true;
 int WindowWidth = 640;
 int WindowHeight = 640;
 
-std::unique_ptr<AnimatedVoronoiDiagram> diagram;
+std::unique_ptr<VoronoiDiagram> diagram;
 
 voronoi_diagram::EdgesPtr edges;
 
@@ -32,7 +32,7 @@ typedef struct TerrainData_
 
 TerrainData g_terrain_data;
 
-void readTerrainData(std::string filename, TerrainData& data)
+void readTerrainData(std::string filename, TerrainData& data, int line_skip=1)
 {
 	FILE *terrain_file;
 	terrain_file = fopen(filename.c_str(), "r");
@@ -52,7 +52,7 @@ void readTerrainData(std::string filename, TerrainData& data)
 	int line = 0;
 	while(fscanf(terrain_file, "%f %f %f" , &x, &y, &z) != EOF)
 	{
-		if((line++) % 100000 != 0)
+		if((line++) % line_skip != 0)
 		{
 			continue;
 		}
@@ -75,6 +75,18 @@ void readTerrainData(std::string filename, TerrainData& data)
 			data.max_z = z;
 	}
 
+	// translate all of the points to the origin
+	float x_trans = -(data.min_x + (data.max_x - data.min_x)/2.0f);
+	float y_trans = -(data.min_y + (data.max_y - data.min_y)/2.0f);
+
+	for(Sites::iterator site = data.sites->begin();
+		site != data.sites->end();
+		site++)
+	{
+		(*site)->x += x_trans;
+		(*site)->y += y_trans;
+	}
+
 	fclose(terrain_file);
 }
 
@@ -94,7 +106,7 @@ SitesPtr generateSites(int num_sites, float diagram_width, float diagram_height,
 
 void DisplayFunc(void)
 {
-	/*	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -147,9 +159,9 @@ void DisplayFunc(void)
 		} glEnd();
 	}
 
-	glutSwapBuffers();*/
+	glutSwapBuffers();
 
-	diagram->display();
+	//diagram->display();
 }
 
 void MouseFunc(int button, int state, int x, int y)
@@ -207,10 +219,10 @@ void KeyboardFunc(unsigned char key, int x, int y)
 		else
 			printf("Not showing voronoi diagram\n");
 		break;
-	case 'N':
+		/*case 'N':
 	case 'n':
 		diagram->nextEvent();
-		break;
+		break;*/
 	}
 
 	glutPostRedisplay();
@@ -234,7 +246,7 @@ int main(int argc, char** argv)
 	edges = diagram->getEdges();*/
 
 	printf("Reading terrain data\n");
-	readTerrainData("../terrain_data/clevel.xyz", g_terrain_data);
+	readTerrainData("../terrain_data/clevel.xyz", g_terrain_data, 10000);
 	//readTerrainData("../terrain_data/test.xyz", g_terrain_data);
 	//readTerrainData("../terrain_data/downsampled_clevel.xyz", g_terrain_data);
 	printf("Number of sites: %d\n", g_terrain_data.sites->size());
@@ -242,12 +254,10 @@ int main(int argc, char** argv)
 	printf("Y Data Range: [%3.3f, %3.3f]\n", g_terrain_data.min_y, g_terrain_data.max_y);
 	printf("Z Data Range: [%3.3f, %3.3f]\n", g_terrain_data.min_z, g_terrain_data.max_z);
 
-	diagram.reset(new AnimatedVoronoiDiagram(g_terrain_data.sites,
+	diagram.reset(new VoronoiDiagram(g_terrain_data.sites,
 									 (g_terrain_data.max_x - g_terrain_data.min_x),
 									 (g_terrain_data.max_y - g_terrain_data.min_y)));
-	diagram->restartAnimation();
-
-	//edges = diagram->getEdges();
+	edges = diagram->getEdges();
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);

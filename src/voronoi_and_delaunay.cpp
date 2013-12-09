@@ -111,13 +111,13 @@ void KeyboardFunc(unsigned char key, int x, int y)
 	case 27:
 		exit(0);
 		break;
-		/*	case 'T':
+	case 'T':
 	case 't':
 		printf("generating new sites\n");
 		sites = generateSites(30, diagram_width, diagram_height, time(NULL));
 		diagram.reset(new VoronoiDiagram(sites, diagram_width, diagram_height));
 		edges = diagram->getEdges();
-		break;*/
+		break;
 	case '+':
 		diagram->setDimensions(diagram_width*.9, diagram_height*.9);
 		edges = diagram->getEdges();
