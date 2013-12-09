@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <cfloat>
+#include <cmath>
 
 using voronoi_diagram::Sites;
 using voronoi_diagram::SitesPtr;
@@ -162,9 +163,14 @@ void ReshapeFunc(int x,int y)
 
 int main(int argc, char** argv)
 {
-	//	SitesPtr sites = generateSites(30, g_diagram_width, g_diagram_height);
-	float diagram_width, diagram_height;
-	SitesPtr sites = readXYZ("../terrain_data/clevel.xyz", &g_diagram_width, &g_diagram_height);
+	SitesPtr sites = generateSites(100, g_diagram_width, g_diagram_height, seed);
+	
+    /*SitesPtr sites(new Sites());
+	for(float theta=0; theta < 2*3.14159; theta += .1)
+	{
+		SitePtr site(new Site(100*cos(theta), 100*sin(theta)));
+		sites->push_back(site);
+	}*/
 
 	diagram.reset(new AnimatedVoronoiDiagram(sites, g_diagram_width, g_diagram_height));
 	diagram->restartAnimation();
