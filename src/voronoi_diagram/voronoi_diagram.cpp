@@ -98,6 +98,30 @@ namespace voronoi_diagram
 			return;
 		}
 
+		if(beachline_->type_ == BeachlineNodeType::ARC && beachline_->site_->y - event->site_->y < 1)
+		{
+			SitePtr fp = beachline_->site_;
+			beachline_->type_ = BeachlineNodeType::EDGE;
+			BeachlineNodePtr arc0(new BeachlineNode(fp));
+			BeachlineNodePtr arc1(new BeachlineNode(event->site_));
+			SitePtr s(new Site((event->site_->x + fp->x)/2.0f, height_));
+			if(event->site_->x > fp->x)
+			{
+				beachline_->edge_.reset(new Edge(s, fp, event->site_));
+				beachline_->setLeftChild(arc0);
+				beachline_->setRightChild(arc1);
+			}
+			else
+			{
+				beachline_->edge_.reset(new Edge(s, event->site_, fp));
+				beachline_->setLeftChild(arc1);
+				beachline_->setRightChild(arc0);
+			}
+			edges_->push_back(beachline_->edge_);
+			
+			return;
+		}
+
 		// split_arc <- get the arc under the site
 		BeachlineNodePtr split_arc = getArcUnderSite(event->site_);
 		// if split_arc has a circle event
@@ -335,6 +359,11 @@ namespace voronoi_diagram
 
 		if(left_arc->site_->y == sweep_line_pos)
 		{
+			if(right_arc->site_->y == sweep_line_pos)
+			{
+				Point edge_point(left_arc->site_->x, FLT_MAX);
+				return edge_point;
+			}
 			float x = left_arc->site_->x;
 			float a = right_arc->site_->x;
 			float b = right_arc->site_->y;
@@ -347,6 +376,12 @@ namespace voronoi_diagram
 
 		if(right_arc->site_->y == sweep_line_pos)
 		{
+			if(left_arc->site_->y == sweep_line_pos)
+			{
+				Point edge_point(left_arc->site_->x, FLT_MAX);
+				return edge_point;
+			}
+
 			float x = right_arc->site_->x;
 			float a = left_arc->site_->x;
 			float b = left_arc->site_->y;
@@ -394,12 +429,19 @@ namespace voronoi_diagram
 	// get the point on a parabola given a focus, directrix and x coordinate
 	PointPtr VoronoiDiagram::getArcPoint(PointPtr focus, float directrix, float x)
 	{
+		if(directrix == focus->y)
+		{
+			PointPtr arc_point(new Point(x, directrix));
+			return arc_point;
+		}
+
 		double denom = 2 * (focus->y - directrix);
 		double a = 1.0f / denom;
 		double b = -2.0f * focus->x / denom;
 		double c = (focus->x*focus->x + focus->y*focus->y - directrix*directrix)/ denom;
 
 		PointPtr arc_point(new Point(x, a*x*x + b*x + c));
+
 		return arc_point;
 	}
 
