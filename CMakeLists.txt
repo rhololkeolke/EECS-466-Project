@@ -6,6 +6,10 @@ set(CMAKE_BUILD_TYPE Debug)
 find_package(PCL REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(GLUT REQUIRED)
+find_package(CGAL COMPONENTS Core)
+
+include(${CGAL_USE_FILE})
+include(CGAL_CreateSingleSourceCGALProgram)
 
 include_directories(
 ${PCL_INCLUDE_DIRS}
@@ -13,7 +17,7 @@ ${OpenGL_INCLUDE_DIRS}
 ${GLUT_INCLUDE_DIRS}
 )
 
-set(LIBS ${PCL_LIBRARIES} ${OpenGL_LIBRARIES} ${GLUT_LIBRARIES} GLU m)
+set(LIBS ${PCL_LIBRARIES} ${OpenGL_LIBRARIES} ${GLUT_LIBRARIES} ${CGAL_LIBRARIES} GLU m )
 
 if(CMAKE_COMPILER_IS_GNUCXX)
     add_definitions(-std=gnu++0x)
@@ -35,3 +39,8 @@ target_link_libraries(voronoi_and_delaunay ${LIBS} voronoi_diagram)
 
 add_executable(terrain_mesh_reconstruction src/terrain_mesh_reconstruction.cpp)
 target_link_libraries(terrain_mesh_reconstruction ${LIBS} voronoi_diagram)
+
+# CGAL
+
+add_executable(array_convex_hull_2 src/cgal_examples/array_convex_hull_2.cpp)
+target_link_libraries(array_convex_hull_2 ${LIBS})
