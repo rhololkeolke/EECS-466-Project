@@ -1,5 +1,6 @@
 #include "animated_voronoi_diagram.h"
 #include "GL/glut.h"
+#include <cstdio>
 
 namespace voronoi_diagram
 {
@@ -102,13 +103,15 @@ namespace voronoi_diagram
 
 	void AnimatedVoronoiDiagram::nextEvent()
 	{
+		if(finished_animation_)
+			return;
 		curr_event_.reset();
 
 		while(!curr_event_ && !event_queue_.empty())
 		{
 			curr_event_ = event_queue_.top();
 			event_queue_.pop();
-			printf("Number of deleted events: %d\n", deleted_events_.size());
+			printf("Number of deleted events: %lu\n", deleted_events_.size());
 			if(deleted_events_.find(curr_event_) != deleted_events_.end())
 			{
 				// remove from the set of deleted events
@@ -131,12 +134,13 @@ namespace voronoi_diagram
 		{
 			VoronoiDiagram::finishEdges(beachline_, view_width_, view_height_);
 			beachline_.reset();
-
+			finished_animation_ = true;
 		}
 	}
 
 	void AnimatedVoronoiDiagram::restartAnimation()
 	{
+		finished_animation_ = false;
 		edges_.reset(new Edges());
 		while(!event_queue_.empty())
 			event_queue_.pop();

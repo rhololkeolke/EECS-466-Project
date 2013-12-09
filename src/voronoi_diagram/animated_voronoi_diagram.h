@@ -11,7 +11,8 @@ namespace voronoi_diagram
 		AnimatedVoronoiDiagram(SitesPtr sites, float width, float height): 
 			VoronoiDiagram(sites, width, height),
 			view_width_(4*width),
-			view_height_(4*height)
+			view_height_(4*height),
+			finished_animation_(false)
 		{}
 
 		virtual ~AnimatedVoronoiDiagram()
@@ -41,6 +42,8 @@ namespace voronoi_diagram
 		void drawBeachline(BeachlineNodePtr arc, float line_position);
 
 		float view_width_, view_height_;
+
+		bool finished_animation_;
 
 	};
 }

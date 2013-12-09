@@ -96,6 +96,7 @@ int main(int argc, char** argv)
 	SitesPtr sites = generateSites(30, g_diagram_width, g_diagram_height);
 
 	diagram.reset(new AnimatedVoronoiDiagram(sites, g_diagram_width, g_diagram_height));
+	diagram->restartAnimation();
 
 	//edges = diagram->getEdges();
 

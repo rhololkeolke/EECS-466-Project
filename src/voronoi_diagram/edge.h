@@ -4,6 +4,7 @@
 #include "point.h"
 #include "edge.h"
 #include <memory>
+#include <cmath>
 
 namespace voronoi_diagram
 {
@@ -20,7 +21,7 @@ namespace voronoi_diagram
 			float x = right->y - left->y;
 			float y = -(right->x - left->x);
 			// calculate the direction vector's magnitude
-			float magnitude = std::sqrtf(x*x + y*y);
+			float magnitude = sqrt(x*x + y*y);
 
 			// normalize the direction vector
 			direction_.reset(new Point(x/magnitude, y/magnitude));
