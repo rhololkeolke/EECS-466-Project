@@ -31,7 +31,6 @@ voronoi_diagram::EdgesPtr edges;
 typedef struct TerrainData_
 {
 	SitesPtr sites;
-	std::vector<float> heights;
 	float min_x, max_x;
 	float min_y, max_y;
 	float min_z, max_z;
@@ -72,9 +71,8 @@ void readTerrainData(std::string filename, TerrainData& data, int line_skip=1)
 			continue;
 		}
 		
-		SitePtr site(new Site(x, y));
+		SitePtr site(new Site(x, y, z));
 		data.sites->push_back(site);
-		data.heights.push_back(z);
 
 		if(x < data.min_x)
 			data.min_x = x;
@@ -141,9 +139,11 @@ void DisplayFunc(void)
 	glPointSize(4.0f);
 	glColor3f(1.0f, 1.0f, 1.0f);
 	glBegin(GL_POINTS); {
-		for(int i=0; i<(int)g_terrain_data.sites->size(); i++)
+		for(Sites::const_iterator site = g_terrain_data.sites->begin();
+			site != g_terrain_data.sites->end();
+			site++)
 		{
-			glVertex3f((*g_terrain_data.sites)[i]->x, (*g_terrain_data.sites)[i]->y, g_terrain_data.heights[i]);
+			glVertex3f((*site)->x, (*site)->y, (*site)->z);
 		}
 
 	} glEnd();
@@ -172,8 +172,8 @@ void DisplayFunc(void)
 				edge != edges->end();
 				edge++)
 			{
-				glVertex2f((*edge)->left_->x, (*edge)->left_->y);
-				glVertex2f((*edge)->right_->x, (*edge)->right_->y);
+				glVertex3f((*edge)->left_->x, (*edge)->left_->y, (*edge)->left_->z);
+				glVertex3f((*edge)->right_->x, (*edge)->right_->y, (*edge)->right_->z);
 			}
 		} glEnd();
 	}

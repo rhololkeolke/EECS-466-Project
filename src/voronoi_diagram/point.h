@@ -8,11 +8,12 @@ namespace voronoi_diagram
 {
 	typedef struct Point_
 	{
-		float x, y;
+		float x, y, z;
 
-		Point_(float x, float y) :
-			x(x), y(y)
+		Point_(float x, float y, float z=0) :
+			x(x), y(y), z(z)
 		{}
+
 	} Point;
 
 	typedef std::shared_ptr<Point> PointPtr;
