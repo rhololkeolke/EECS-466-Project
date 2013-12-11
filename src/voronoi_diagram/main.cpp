@@ -16,9 +16,11 @@ using voronoi_diagram::AnimatedVoronoiDiagram;
 int WindowWidth = 640;
 int WindowHeight = 640;
 
-int seed = 1;
+const int NUM_SITES = 5;
 
-float g_diagram_width = 200.0f, g_diagram_height = 200.0f;
+int seed = 13;
+
+float g_diagram_width = 10.0f, g_diagram_height = 10.0f;
 
 std::unique_ptr<AnimatedVoronoiDiagram> diagram;
 
@@ -125,7 +127,14 @@ void KeyboardFunc(unsigned char key, int x, int y)
 		break;
 	case 'N':
 	case 'n':
-		printf("[%d] next event\n", iteration++);
+		if(diagram->finished())
+		{
+			printf("Generating new points with seed %d\n", ++seed);
+			sites = generateSites(NUM_SITES, g_diagram_width, g_diagram_height, seed);
+			diagram.reset(new AnimatedVoronoiDiagram(sites, g_diagram_width, g_diagram_height));
+			diagram->restartAnimation();
+		}
+		//printf("[%d] next event\n", iteration++);
 		diagram->nextEvent();
 		break;
 	case 'R':
@@ -137,7 +146,7 @@ void KeyboardFunc(unsigned char key, int x, int y)
 	case 'T':
 	case 't':
 		printf("Generating new points with seed %d\n", ++seed);
-		sites = generateSites(100, g_diagram_width, g_diagram_height, seed);
+		sites = generateSites(NUM_SITES, g_diagram_width, g_diagram_height, seed);
 		diagram.reset(new AnimatedVoronoiDiagram(sites, g_diagram_width, g_diagram_height));
 		diagram->restartAnimation();
 		break;
@@ -163,7 +172,7 @@ void ReshapeFunc(int x,int y)
 
 int main(int argc, char** argv)
 {
-	SitesPtr sites = generateSites(100, g_diagram_width, g_diagram_height, seed);
+	SitesPtr sites = generateSites(NUM_SITES, g_diagram_width, g_diagram_height, seed);
 	
     /*SitesPtr sites(new Sites());
 	for(float theta=0; theta < 2*3.14159; theta += .1)

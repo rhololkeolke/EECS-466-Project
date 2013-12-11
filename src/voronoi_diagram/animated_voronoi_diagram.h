@@ -36,6 +36,11 @@ namespace voronoi_diagram
 		}
 		void setViewHeight(float height);
 
+		bool finished()
+		{
+			return finished_animation_;
+		}
+
 	private:
 		EventPtr curr_event_;
 
