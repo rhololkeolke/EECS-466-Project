@@ -33,6 +33,9 @@ target_link_libraries(voronoi_diagram ${LIBS})
 add_executable(mesh_sampler src/mesh_sampler.cpp)
 target_link_libraries(mesh_sampler tinyobjloader)
 
+add_executable(mesh_sample_viewer src/mesh_sample_viewer.cpp)
+target_link_libraries(mesh_sample_viewer ${LIBS})
+
 add_executable(animated_voronoi_diagram_example src/voronoi_diagram/main.cpp)
 target_link_libraries(animated_voronoi_diagram_example ${LIBS} voronoi_diagram)
 
