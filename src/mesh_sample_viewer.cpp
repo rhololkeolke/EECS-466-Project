@@ -196,9 +196,6 @@ void KeyboardFunc(unsigned char key, int x, int y)
 
 int main(int argc, char** argv)
 {
-	g_camera.radius = 1000.0f;
-	g_camera.phi = 1.57;
-	g_camera.theta = 1.57;
 
 	if(argc <= 1)
 	{
@@ -208,6 +205,11 @@ int main(int argc, char** argv)
 	}
 
 	readMeshSamplesFile(argv[1], g_mesh_samples);
+
+	g_camera.radius = g_mesh_samples.z_max+10;
+	g_camera.phi = 1.57;
+	g_camera.theta = 1.57;
+
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
