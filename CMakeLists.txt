@@ -3,17 +3,21 @@ project(eecs466_project)
 
 set(CMAKE_BUILD_TYPE Debug)
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
+
 find_package(PCL REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(GLUT REQUIRED)
+find_package(GLEW REQUIRED)
 
 include_directories(
 ${PCL_INCLUDE_DIRS}
 ${OpenGL_INCLUDE_DIRS}
 ${GLUT_INCLUDE_DIRS}
+${GLEW_INCLUDE_DIR}
 )
 
-set(LIBS ${PCL_LIBRARIES} ${OpenGL_LIBRARIES} ${GLUT_LIBRARIES} GLU m)
+set(LIBS ${PCL_LIBRARIES} ${OpenGL_LIBRARIES} ${GLUT_LIBRARIES} GLU ${GLEW_LIBRARY} m)
 
 if(CMAKE_COMPILER_IS_GNUCXX)
     add_definitions(-std=gnu++0x)
