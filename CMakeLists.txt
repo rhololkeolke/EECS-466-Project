@@ -27,6 +27,8 @@ include_directories(src/voronoi_diagram)
 add_library(voronoi_diagram src/voronoi_diagram/beachline_node.cpp src/voronoi_diagram/voronoi_diagram.cpp src/voronoi_diagram/animated_voronoi_diagram.cpp)
 target_link_libraries(voronoi_diagram ${LIBS})
 
+add_executable(mesh_sampler src/mesh_sampler.cpp)
+
 add_executable(animated_voronoi_diagram_example src/voronoi_diagram/main.cpp)
 target_link_libraries(animated_voronoi_diagram_example ${LIBS} voronoi_diagram)
 
