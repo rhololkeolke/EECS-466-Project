@@ -23,11 +23,15 @@ add_executable(glut_example src/glut_example.cpp)
 target_link_libraries(glut_example ${LIBS})
 
 include_directories(src/voronoi_diagram)
+include_directories(libraries/tinyobjloader)
+
+add_library(tinyobjloader libraries/tinyobjloader/tiny_obj_loader.cc)
 
 add_library(voronoi_diagram src/voronoi_diagram/beachline_node.cpp src/voronoi_diagram/voronoi_diagram.cpp src/voronoi_diagram/animated_voronoi_diagram.cpp)
 target_link_libraries(voronoi_diagram ${LIBS})
 
 add_executable(mesh_sampler src/mesh_sampler.cpp)
+target_link_libraries(mesh_sampler tinyobjloader)
 
 add_executable(animated_voronoi_diagram_example src/voronoi_diagram/main.cpp)
 target_link_libraries(animated_voronoi_diagram_example ${LIBS} voronoi_diagram)
