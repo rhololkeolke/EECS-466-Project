@@ -1,5 +1,5 @@
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
-#include <CGAL/Projection_traits_xy_3.h>
+#include <CGAL/Triangulation_vertex_base_with_info_2.h>
 #include <CGAL/Delaunay_triangulation_2.h>
 
 #include <GL/glut.h>
@@ -10,11 +10,14 @@
 #include <cstdlib>
 
 typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
-typedef CGAL::Projection_traits_xy_3<K> Gt;
-typedef CGAL::Delaunay_triangulation_2<Gt> Delaunay;
-typedef K::Point_3 Point;
+typedef CGAL::Triangulation_vertex_base_with_info_2<float, K>    Vb;
+typedef CGAL::Triangulation_data_structure_2<Vb>                    Tds;
+typedef CGAL::Delaunay_triangulation_2<K, Tds> Delaunay;
+typedef K::Point_2 Point;
 
-std::vector<Point> input;
+typedef std::vector<std::pair<Point, float> > Points;
+
+Points input;
 Delaunay dt;
 
 float g_diagram_width = 200.0f, g_diagram_length = 200.0f, g_diagram_height = 200.0f;
@@ -24,7 +27,7 @@ const int NUM_POINTS = 100;
 
 int WindowWidth=640, WindowHeight=640;
 
-void generatePoints(int num_points, std::vector<Point>& input, int seed=1)
+void generatePoints(int num_points, Points& input, int seed=1)
 {
 	srand(seed);
 
@@ -32,8 +35,7 @@ void generatePoints(int num_points, std::vector<Point>& input, int seed=1)
 	
 	for(int i=0; i<num_points; i++)
 	{
-		Point new_point((rand()%(int)g_diagram_width) - g_diagram_width/2.0f, (rand()%(int)g_diagram_length) - g_diagram_length/2.0f, (rand()%(int)g_diagram_height) - g_diagram_height/2.0f);
-		input.push_back(new_point);
+		input.push_back(std::make_pair(Point((rand()%(int)g_diagram_width) - g_diagram_width/2.0f, (rand()%(int)g_diagram_length) - g_diagram_length/2.0f), (rand()%(int)g_diagram_height) - g_diagram_height/2.0f));
 	}
 }
 
@@ -53,11 +55,11 @@ void DisplayFunc(void)
 	glPointSize(4.0f);
 	glColor3f(1.0f, 1.0f, 1.0f);
 	glBegin(GL_POINTS); {
-		for(std::vector<Point>::const_iterator point = input.begin();
+		for(Points::const_iterator point = input.begin();
 			point != input.end();
 			point++)
 		{
-			glVertex2f((float)point->x(), (float)point->y());//, (float)point->z());
+			glVertex2f((float)point->first.x(), (float)point->first.y());
 		}
 	} glEnd();
 
@@ -95,13 +97,10 @@ void KeyboardFunc(unsigned char key, int x, int y)
 	case 't':
 		generatePoints(NUM_POINTS, input, ++g_seed);
 		printf("seed %d\n", g_seed);
-		for(std::vector<Point>::const_iterator point = input.begin();
-			point != input.end();
-			point++)
-		{
-			new_dt.insert(*point);
-		}
+		Delaunay new_dt;
+		new_dt.insert(input.begin(), input.end());
 		dt = new_dt;
+	
 		break;
 	}
 
@@ -118,13 +117,8 @@ void ReshapeFunc(int x, int y)
 int main(int argc, char** argv)
 {
 	generatePoints(NUM_POINTS, input, ++g_seed);
-	
-	for(std::vector<Point>::const_iterator point = input.begin();
-		point != input.end();
-		point++)
-	{
-		dt.insert(*point);
-	}
+
+	dt.insert(input.begin(), input.end());
 	
 	std::cout << dt.number_of_vertices() << std::endl;
 
@@ -134,14 +128,14 @@ int main(int argc, char** argv)
 		edge != dt.edges_end();
 		edge++)
 	{
-		//CGAL::Object o = dt.dual(edge);
-		//if(CGAL::object_cast<Delaunay::Segment>(&o))
-		//	nl++;
-		//else if(CGAL::object_cast<Delaunay::Ray>(&o))
-		//	nr++;
+		CGAL::Object o = dt.dual(edge);
+		if(CGAL::object_cast<K::Segment_2>(&o))
+			nl++;
+		else if(CGAL::object_cast<K::Ray_2>(&o))
+			nr++;
 	}
 
-	std::cout << "The Voronoi diagram has " << nl << " line segments and " << nr << "rays." << std::endl;
+	std::cout << "The Voronoi diagram has " << nl << " line segments and " << nr << " rays." << std::endl;
 
 
 	glutInit(&argc, argv);
