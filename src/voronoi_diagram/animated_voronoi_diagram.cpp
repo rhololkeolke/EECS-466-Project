@@ -105,6 +105,7 @@ namespace voronoi_diagram
 	{
 		if(finished_animation_)
 			return;
+
 		curr_event_.reset();
 
 		while(!curr_event_ && !event_queue_.empty())

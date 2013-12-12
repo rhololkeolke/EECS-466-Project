@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <cfloat>
+#include <cmath>
 
 using voronoi_diagram::Sites;
 using voronoi_diagram::SitesPtr;
@@ -14,6 +15,8 @@ using voronoi_diagram::AnimatedVoronoiDiagram;
 
 int WindowWidth = 640;
 int WindowHeight = 640;
+
+int seed = 1;
 
 float g_diagram_width = 200.0f, g_diagram_height = 200.0f;
 
@@ -113,6 +116,7 @@ void MotionFunc(int x, int y)
 
 void KeyboardFunc(unsigned char key, int x, int y)
 {
+	SitesPtr sites;
 	switch(key)
 	{
 	case 'Q':
@@ -132,7 +136,10 @@ void KeyboardFunc(unsigned char key, int x, int y)
 		break;
 	case 'T':
 	case 't':
-		// printf("Generating new points");
+		printf("Generating new points with seed %d\n", ++seed);
+		sites = generateSites(100, g_diagram_width, g_diagram_height, seed);
+		diagram.reset(new AnimatedVoronoiDiagram(sites, g_diagram_width, g_diagram_height));
+		diagram->restartAnimation();
 		break;
 	case '+':
 		printf("%3.3f x %3.3f\n", diagram->getViewWidth(), diagram->getViewHeight());
@@ -156,9 +163,14 @@ void ReshapeFunc(int x,int y)
 
 int main(int argc, char** argv)
 {
-	//	SitesPtr sites = generateSites(30, g_diagram_width, g_diagram_height);
-	float diagram_width, diagram_height;
-	SitesPtr sites = readXYZ("../terrain_data/clevel.xyz", &g_diagram_width, &g_diagram_height);
+	SitesPtr sites = generateSites(100, g_diagram_width, g_diagram_height, seed);
+	
+    /*SitesPtr sites(new Sites());
+	for(float theta=0; theta < 2*3.14159; theta += .1)
+	{
+		SitePtr site(new Site(100*cos(theta), 100*sin(theta)));
+		sites->push_back(site);
+	}*/
 
 	diagram.reset(new AnimatedVoronoiDiagram(sites, g_diagram_width, g_diagram_height));
 	diagram->restartAnimation();

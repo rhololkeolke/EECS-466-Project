@@ -1,4 +1,5 @@
 #include "voronoi_diagram.h"
+#include <cfloat>
 
 namespace voronoi_diagram
 {
@@ -95,6 +96,30 @@ namespace voronoi_diagram
 		{
 			// initialize the beachline with an arc focused at this site
 			beachline_.reset(new BeachlineNode(event->site_));
+			return;
+		}
+
+		if(beachline_->type_ == BeachlineNodeType::ARC && beachline_->site_->y - event->site_->y < 1)
+		{
+			SitePtr fp = beachline_->site_;
+			beachline_->type_ = BeachlineNodeType::EDGE;
+			BeachlineNodePtr arc0(new BeachlineNode(fp));
+			BeachlineNodePtr arc1(new BeachlineNode(event->site_));
+			SitePtr s(new Site((event->site_->x + fp->x)/2.0f, height_));
+			if(event->site_->x > fp->x)
+			{
+				beachline_->edge_.reset(new Edge(s, fp, event->site_));
+				beachline_->setLeftChild(arc0);
+				beachline_->setRightChild(arc1);
+			}
+			else
+			{
+				beachline_->edge_.reset(new Edge(s, event->site_, fp));
+				beachline_->setLeftChild(arc1);
+				beachline_->setRightChild(arc0);
+			}
+			edges_->push_back(beachline_->edge_);
+			
 			return;
 		}
 
@@ -335,6 +360,11 @@ namespace voronoi_diagram
 
 		if(left_arc->site_->y == sweep_line_pos)
 		{
+			if(right_arc->site_->y == sweep_line_pos)
+			{
+				Point edge_point(left_arc->site_->x, FLT_MAX);
+				return edge_point;
+			}
 			float x = left_arc->site_->x;
 			float a = right_arc->site_->x;
 			float b = right_arc->site_->y;
@@ -347,6 +377,12 @@ namespace voronoi_diagram
 
 		if(right_arc->site_->y == sweep_line_pos)
 		{
+			if(left_arc->site_->y == sweep_line_pos)
+			{
+				Point edge_point(left_arc->site_->x, FLT_MAX);
+				return edge_point;
+			}
+
 			float x = right_arc->site_->x;
 			float a = left_arc->site_->x;
 			float b = left_arc->site_->y;
@@ -364,6 +400,16 @@ namespace voronoi_diagram
 		float b1 = -2.0f*left_arc->site_->x / denom1;
 		float c1 = (left_arc->site_->x*left_arc->site_->x + left_arc->site_->y*left_arc->site_->y - sweep_line_pos*sweep_line_pos) / denom1;
 
+		// degenerate case
+		if(left_arc->site_->y == right_arc->site_->y)
+		{
+			float x = (right_arc->site_->x - left_arc->site_->x)/2.0f + left_arc->site_->x;
+			float y = a1*x*x + b1*x + c1;
+
+			Point edge_point(x, y);
+			return edge_point;
+		}
+
 		// now do the same thing for the right parabola
 		float denom2 = 2.0f*(right_arc->site_->y - sweep_line_pos);
 		float a2 = 1/denom2;
@@ -372,6 +418,7 @@ namespace voronoi_diagram
 
 		// now get the coefficients for the quadratic equation that we'll be solving
 		float a = a1 - a2;
+
 		float b = b1 - b2;
 		float c = c1 - c2;
 
@@ -394,47 +441,62 @@ namespace voronoi_diagram
 	// get the point on a parabola given a focus, directrix and x coordinate
 	PointPtr VoronoiDiagram::getArcPoint(PointPtr focus, float directrix, float x)
 	{
+		if(directrix == focus->y)
+		{
+			PointPtr arc_point(new Point(x, directrix));
+			return arc_point;
+		}
+
 		double denom = 2 * (focus->y - directrix);
 		double a = 1.0f / denom;
 		double b = -2.0f * focus->x / denom;
 		double c = (focus->x*focus->x + focus->y*focus->y - directrix*directrix)/ denom;
 
 		PointPtr arc_point(new Point(x, a*x*x + b*x + c));
+
 		return arc_point;
 	}
 
-	PointPtr VoronoiDiagram::getEdgeIntersection(EdgePtr a, EdgePtr b)
+	PointPtr VoronoiDiagram::getEdgeIntersection(EdgePtr left, EdgePtr right)
 	{
-		// edge 1 has an equation 
-		// y = m1*x + b1
-		float m1 = a->direction_->y/a->direction_->x;
-		float b1 = a->start_->y - m1*a->start_->x;
+		// these are temp variables that match
+		// the algebra letters I used when I derived this on paper
+		float ax = left->start_->x;
+		float ay = left->start_->y;
 
-		// edge 2 has an equation
-		// y = m2*x + b2
-		float m2 = b->direction_->y/b->direction_->x;
-		float b2 = b->start_->y - m2*b->start_->x;
+		float bx = left->direction_->x;
+		float by = left->direction_->y;
 
-		// setting the 2 equations equal and solving for the x-coordinate of the intersection
-		float x = (b2-b1)/(m1-m2);
-		// plug the x back into one of the edge equations to get y
-		float y = m1*x + b1;
+		float cx = right->start_->x;
+		float cy = right->start_->y;
 
-		// now check that this intersection is in the direction of both of the edges
-		// otherwise they never actually intersect
-		// do this by verifying the sign of the vector from each start point to the intersection matches
-		// that edge's sign
-		if((x - a->start_->x)/a->direction_->x < 0)
-			return nullptr;
-		if((y - a->start_->y)/a->direction_->y < 0)
+		float dx = right->direction_->x;
+		float dy = right->direction_->y;
+
+		// if u_denom is 0 then the lines are parallel
+		float u_denom = (dx*by - dy*bx);
+		if(u_denom == 0)
 			return nullptr;
 
-		if((x - b->start_->x)/b->direction_->x < 0)
-			return nullptr;
-		if((y - b->start_->y)/b->direction_->y < 0)
+		// if t_denom is 0 then the lines are parallel
+		// probably don't have to check this since u_denom
+		// is being checked but this can't hurt
+		float t_denom = (bx*dy - by*dx);
+		if(t_denom == 0)
 			return nullptr;
 
-		PointPtr intersection(new Point(x, y));
+		// now actually calculate the parameters
+		// u goes with right and t goes with left
+		float u = (bx*(cy-ay) + by*(ax - cx))/u_denom;
+		float t = (dx*(ay-cy) + dy*(cx - ax))/t_denom;
+
+		// if the intersection occurred in the reverse line direction
+		// then no new intersections found
+		if(u < 0 || t < 0)
+			return nullptr;
+
+		PointPtr intersection(new Point(left->start_->x + t*left->direction_->x,
+			left->start_->y + t*left->direction_->y));
 		return intersection;
 	}
 
@@ -471,3 +533,4 @@ namespace voronoi_diagram
 		finishEdges(node->getRightChild(), width, height);
 	}
 }
+
