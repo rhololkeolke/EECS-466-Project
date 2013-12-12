@@ -40,7 +40,7 @@ add_executable(mesh_triangle_sampler src/mesh_triangle_sampler.cpp)
 target_link_libraries(mesh_triangle_sampler mesh_sampler_utils)
 
 add_executable(mesh_sample_viewer src/mesh_sample_viewer.cpp)
-target_link_libraries(mesh_sample_viewer ${LIBS})
+target_link_libraries(mesh_sample_viewer ${LIBS} mesh_sampler_utils)
 
 add_executable(animated_voronoi_diagram_example src/voronoi_diagram/main.cpp)
 target_link_libraries(animated_voronoi_diagram_example ${LIBS} voronoi_diagram)

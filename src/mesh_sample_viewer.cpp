@@ -7,6 +7,8 @@
 #include <vector>
 #include <string>
 
+#include "mesh_sampler_utils.h"
+
 using std::vector;
 using std::string;
 
@@ -20,82 +22,8 @@ int MouseY = 0;
 bool MouseLeft = false;
 bool MouseRight = false;
 
-
-typedef struct Point_
-{
-	float x, y, z;
-} Point;
-
-typedef struct MeshSamples_
-{
-	std::vector<Point> samples;
-	float x_min, x_max;
-	float y_min, y_max;
-	float z_min, z_max;
-} MeshSamples;
-
-typedef struct Camera_
-{
-	float radius;
-	float phi;
-	float theta;
-} Camera;
-
 MeshSamples g_mesh_samples;
 Camera g_camera;
-
-void readMeshSamplesFile(std::string filename, MeshSamples& data)
-{
-	FILE* mesh_sample_file;
-	mesh_sample_file = fopen(filename.c_str(), "r");
-
-	if(!mesh_sample_file)
-	{
-		fprintf(stderr, "Failed to open file %s", filename.c_str());
-		fclose(mesh_sample_file);
-		exit(-1);
-	}
-
-	data.samples.clear();
-	data.x_min = data.y_min = data.z_min = FLT_MAX;
-	data.x_max = data.y_max = data.z_max = -FLT_MAX;
-
-	Point p;
-	while(fscanf(mesh_sample_file, "%f %f %f", &p.x, &p.y, &p.z) != EOF)
-	{
-		data.samples.push_back(p);
-	}
-
-	if(p.x < data.x_min)
-		data.x_min = p.x;
-	if(p.x > data.x_max)
-		data.x_max = p.x;
-
-	if(p.y < data.y_min)
-		data.y_min = p.y;
-	if(p.y > data.y_max)
-		data.y_max = p.y;
-
-	if(p.z < data.z_min)
-		data.z_min = p.z;
-	if(p.z > data.z_max)
-		data.z_max = p.z;
-
-	float x_trans = -(data.x_min + ( data.x_max - data.x_min)/2.0f);
-	float y_trans = -(data.y_min + ( data.y_max - data.y_min)/2.0f);
-	float z_trans = -(data.z_min + ( data.z_max - data.z_min)/2.0f);
-
-	for(vector<Point>::iterator sample = data.samples.begin();
-		sample != data.samples.end();
-		sample++)
-	{
-		sample->x += x_trans;
-		sample->y += y_trans;
-		sample->z += z_trans;
-	}
-
-	fclose(mesh_sample_file);
-}
 
 void DisplayFunc(void)
 {

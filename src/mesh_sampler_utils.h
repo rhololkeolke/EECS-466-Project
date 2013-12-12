@@ -22,6 +22,22 @@ typedef struct BoundingBox_
 	float z_min, z_max;
 } BoundingBox;
 
+typedef struct MeshSamples_
+{
+	std::vector<Point> samples;
+	float x_min, x_max;
+	float y_min, y_max;
+	float z_min, z_max;
+} MeshSamples;
+
+typedef struct Camera_
+{
+	float radius;
+	float phi;
+	float theta;
+} Camera;
+
+
 inline Vector cross(const Vector& v1, const Vector& v2)
 {
 	Vector result;
@@ -43,3 +59,5 @@ BoundingBox findBoundingBox(const std::vector<float>& vertices);
 void rotationMatrixAboutAxis(RotationAxis axis, float angle, float* rot_mat);
 
 void rotateMesh(tinyobj::mesh_t& mesh, float* rot_mat);
+
+void readMeshSamplesFile(std::string filename, MeshSamples& data);
