@@ -44,3 +44,6 @@ target_link_libraries(terrain_mesh_reconstruction ${LIBS} voronoi_diagram)
 
 add_executable(array_convex_hull_2 src/cgal_examples/array_convex_hull_2.cpp)
 target_link_libraries(array_convex_hull_2 ${LIBS})
+
+add_executable(delaunay_surface src/cgal_examples/delaunay_surface.cpp)
+target_link_libraries(delaunay_surface ${LIBS})
