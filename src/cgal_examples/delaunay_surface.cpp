@@ -8,6 +8,7 @@
 #include <iostream>
 
 #include <cstdlib>
+#include <cfloat>
 
 typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
 typedef CGAL::Triangulation_vertex_base_with_info_2<float, K>    Vb;
@@ -26,6 +27,9 @@ int g_seed = 0;
 const int NUM_POINTS = 100;
 
 int WindowWidth=640, WindowHeight=640;
+
+bool g_show_voronoi = true;
+bool g_show_delaunay = true;
 
 void generatePoints(int num_points, Points& input, int seed=1)
 {
@@ -63,23 +67,56 @@ void DisplayFunc(void)
 		}
 	} glEnd();
 
-	glColor3f(1.0f, 0.0f, 0.0f);
-	glBegin(GL_TRIANGLES); {
-		for(Delaunay::Finite_faces_iterator face = dt.finite_faces_begin();
-			face != dt.finite_faces_end();
-			face++)
-		{
-			for(int i=0; i<3; i++)
+	if(g_show_delaunay)
+	{
+		glColor3f(1.0f, 0.0f, 0.0f);
+		glBegin(GL_TRIANGLES); {
+			for(Delaunay::Finite_faces_iterator face = dt.finite_faces_begin();
+				face != dt.finite_faces_end();
+				face++)
 			{
-				glVertex2f((float)face->vertex(i)->point().x(), (float)face->vertex(i)->point().y()); //, (float)v.point().z());
+				for(int i=0; i<3; i++)
+				{
+					glVertex2f((float)face->vertex(i)->point().x(), (float)face->vertex(i)->point().y()); //, (float)v.point().z());
+				}
 			}
-		}
-	} glEnd();
+		} glEnd();
+	}
 
-	glColor3f(0.0f, 0.0f, 1.0f);
-	glBegin(GL_LINES); {
-		
-	} glEnd();
+	if(g_show_voronoi)
+	{
+		glColor3f(0.0f, 0.0f, 1.0f);
+		glBegin(GL_LINES); {
+			for(Delaunay::Edge_iterator edge = dt.edges_begin();
+				edge != dt.edges_end();
+				edge++)
+			{
+				CGAL::Object o = dt.dual(edge);
+
+				const K::Segment_2* segment = CGAL::object_cast<K::Segment_2>(&o);
+				if(segment)
+				{
+					glVertex2f((float)segment->source().x(), (float)segment->source().y());
+					glVertex2f((float)segment->target().x(), (float)segment->target().y());
+				}
+				else
+				{
+					const K::Ray_2* ray = CGAL::object_cast<K::Ray_2>(&o);
+					if(ray)
+					{
+						glVertex2f((float)ray->source().x(), (float)ray->source().y());
+
+						// instead of calculating the exact point where the ray intersects the
+						// appropriate clipping plane just set the second vertex as a point
+						// really far away
+						float x = ray->source().x() + 1000.0f*ray->direction().dx();
+						float y = ray->source().y() + 1000.0f*ray->direction().dy();
+						glVertex2f(x, y);
+					}
+				}
+			}
+		} glEnd();
+	}
 
 	glutSwapBuffers();
 }
@@ -97,10 +134,20 @@ void KeyboardFunc(unsigned char key, int x, int y)
 	case 't':
 		generatePoints(NUM_POINTS, input, ++g_seed);
 		printf("seed %d\n", g_seed);
-		Delaunay new_dt;
 		new_dt.insert(input.begin(), input.end());
 		dt = new_dt;
-	
+		break;
+	case 'V':
+	case 'v':
+		g_show_voronoi = !g_show_voronoi;
+		break;
+	case 'D':
+	case 'd':
+		g_show_delaunay = !g_show_delaunay;
+		break;
+	case '+':
+		break;
+	case '-':
 		break;
 	}
 
