@@ -443,9 +443,10 @@ int main(int argc, char** argv)
 	edges = diagram->getEdges();*/
 
 	printf("Reading terrain data\n");
-	readTerrainData("../terrain_data/clevel.xyz", g_terrain_data, 3000);
+	//readTerrainData("../terrain_data/clevel.xyz", g_terrain_data, 3000);
 	//readTerrainData("../terrain_data/test.xyz", g_terrain_data);
 	//readTerrainData("../terrain_data/downsampled_clevel.xyz", g_terrain_data);
+	readTerrainData("../meshes/gourd.xyz", g_terrain_data);
 	printf("Number of sites: %d\n", g_terrain_data.sites->size());
 	printf("X Data Range: [%3.3f, %3.3f]\n", g_terrain_data.min_x, g_terrain_data.max_x);
 	printf("Y Data Range: [%3.3f, %3.3f]\n", g_terrain_data.min_y, g_terrain_data.max_y);
