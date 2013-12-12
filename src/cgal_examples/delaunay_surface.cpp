@@ -10,6 +10,8 @@
 #include <cstdlib>
 #include <cfloat>
 
+#define PI 3.14159265359
+
 typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
 typedef CGAL::Triangulation_vertex_base_with_info_2<float, K>    Vb;
 typedef CGAL::Triangulation_data_structure_2<Vb>                    Tds;
@@ -28,8 +30,22 @@ const int NUM_POINTS = 100;
 
 int WindowWidth=640, WindowHeight=640;
 
+int MouseX = 0;
+int MouseY = 0;
+bool MouseLeft = false;
+bool MouseRight = false;
+
 bool g_show_voronoi = true;
 bool g_show_delaunay = true;
+
+typedef struct Camera_
+{
+	float radius;
+	float phi;
+	float theta;
+} Camera;
+
+Camera g_camera;
 
 void generatePoints(int num_points, Points& input, int seed=1)
 {
@@ -51,7 +67,13 @@ void DisplayFunc(void)
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
-	gluOrtho2D(-g_diagram_width/2.0f, g_diagram_width/2.0f, -g_diagram_length/2.0f, g_diagram_length/2.0f);
+	gluPerspective(60.0, 1.0, 0.01, 10000.0);
+
+	gluLookAt(g_camera.radius*cos(g_camera.theta)*sin(g_camera.phi),
+			  g_camera.radius*cos(g_camera.phi),
+			  g_camera.radius*sin(g_camera.theta)*sin(g_camera.phi),
+			  0.0, 0.0, 0.0,
+			  0.0, 1.0, 0.0);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -63,7 +85,7 @@ void DisplayFunc(void)
 			point != input.end();
 			point++)
 		{
-			glVertex2f((float)point->first.x(), (float)point->first.y());
+			glVertex3f((float)point->first.x(), (float)point->first.y(), (float)point->second);
 		}
 	} glEnd();
 
@@ -77,7 +99,7 @@ void DisplayFunc(void)
 			{
 				for(int i=0; i<3; i++)
 				{
-					glVertex2f((float)face->vertex(i)->point().x(), (float)face->vertex(i)->point().y()); //, (float)v.point().z());
+					glVertex3f((float)face->vertex(i)->point().x(), (float)face->vertex(i)->point().y(), (float)face->vertex(i)->info());
 				}
 			}
 		} glEnd();
@@ -146,10 +168,49 @@ void KeyboardFunc(unsigned char key, int x, int y)
 		g_show_delaunay = !g_show_delaunay;
 		break;
 	case '+':
+		g_camera.radius *= .9f;
 		break;
 	case '-':
+		g_camera.radius *= 1.1f;
 		break;
 	}
+
+	glutPostRedisplay();
+}
+
+void MouseFunc(int button, int state, int x, int y)
+{
+	MouseX = x;
+	MouseY = y;
+
+	if(button == GLUT_LEFT_BUTTON)
+		MouseLeft = !(bool) state;
+	if(button == GLUT_RIGHT_BUTTON)
+		MouseRight = !(bool) state;
+}
+
+void MotionFunc(int x, int y)
+{
+
+	if(MouseLeft)
+	{
+		g_camera.theta += 0.01*PI*(MouseX - x);
+		g_camera.phi += 0.01*PI*(MouseY - y);
+		if(g_camera.phi > (PI - 0.01))
+			g_camera.phi = PI - 0.01;
+		if(g_camera.phi < 0.01)
+			g_camera.phi = 0.01;
+	}
+
+	if(MouseRight)
+	{
+		g_camera.radius += 0.2*(MouseY - y);
+		if(g_camera.radius <= 0)
+			g_camera.radius = 0.2;
+	}
+
+	MouseX = x;
+	MouseY = y;
 
 	glutPostRedisplay();
 }
@@ -163,6 +224,11 @@ void ReshapeFunc(int x, int y)
 
 int main(int argc, char** argv)
 {
+
+	g_camera.radius = 10.0f;
+	g_camera.phi = 1.57;
+	g_camera.theta = 1.57;
+
 	generatePoints(NUM_POINTS, input, ++g_seed);
 
 	dt.insert(input.begin(), input.end());
@@ -194,6 +260,8 @@ int main(int argc, char** argv)
 	glutDisplayFunc(DisplayFunc);
 	glutReshapeFunc(ReshapeFunc);
 	glutKeyboardFunc(KeyboardFunc);
+	glutMouseFunc(MouseFunc);
+	glutMotionFunc(MotionFunc);
 
 	glutMainLoop();
 	
