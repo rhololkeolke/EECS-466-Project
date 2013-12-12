@@ -59,3 +59,6 @@ target_link_libraries(terrain_mesh_reconstruction ${LIBS} voronoi_diagram)
 
 add_executable(mesh_samples_to_pcd src/mesh_samples_to_pcd)
 target_link_libraries(mesh_samples_to_pcd ${PCL_LIBRARIES} mesh_sampler_utils)
+
+add_executable(pcl_greedy_triangulation src/pcl_greedy_triangulation.cpp)
+target_link_libraries(pcl_greedy_triangulation ${PCL_LIBRARIES})
