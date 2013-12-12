@@ -3,15 +3,21 @@ project(eecs466_project)
 
 set(CMAKE_BUILD_TYPE Debug)
 
-find_package(PCL REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(GLUT REQUIRED)
+find_package(PCL 1.7 REQUIRED COMPONENTS common io kdtree features surface search)
 
 include_directories(
 ${PCL_INCLUDE_DIRS}
 ${OpenGL_INCLUDE_DIRS}
 ${GLUT_INCLUDE_DIRS}
 )
+
+link_directories(${PCL_LIBRARY_DIRS})
+add_definitions(${PCL_DEFINITIONS})
+
+
+set(PCL_LIBRARIES ${PCL_COMMON_LIBRARIES} ${PCL_IO_LIBRARIES} ${PCL_KDTREE_LIBRARIES} ${PCL_FEATURES_LIBRARIES} ${PCL_SURFACE_LIBRARIES} ${PCL_SEARCH_LIBRARIES})
 
 set(LIBS ${PCL_LIBRARIES} ${OpenGL_LIBRARIES} ${GLUT_LIBRARIES} GLU m)
 
@@ -50,3 +56,6 @@ target_link_libraries(voronoi_and_delaunay ${LIBS} voronoi_diagram)
 
 add_executable(terrain_mesh_reconstruction src/terrain_mesh_reconstruction.cpp)
 target_link_libraries(terrain_mesh_reconstruction ${LIBS} voronoi_diagram)
+
+add_executable(mesh_samples_to_pcd src/mesh_samples_to_pcd)
+target_link_libraries(mesh_samples_to_pcd ${PCL_LIBRARIES} mesh_sampler_utils)
