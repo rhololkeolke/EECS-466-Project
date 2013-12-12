@@ -20,7 +20,6 @@ typedef K::Point_2 Point;
 
 typedef std::vector<std::pair<Point, float> > Points;
 
-Points input;
 Delaunay dt;
 
 float g_diagram_width = 200.0f, g_diagram_length = 200.0f, g_diagram_height = 200.0f;
@@ -46,6 +45,69 @@ typedef struct Camera_
 } Camera;
 
 Camera g_camera;
+
+typedef struct MeshSamples_
+{
+	Points samples;
+	float x_min, x_max;
+	float y_min, y_max;
+	float z_min, z_max;
+} MeshSamples;
+
+MeshSamples g_mesh_samples;
+
+void readMeshSamplesFile(std::string filename, MeshSamples& data)
+{
+	FILE* mesh_sample_file;
+	mesh_sample_file = fopen(filename.c_str(), "r");
+
+	if(!mesh_sample_file)
+	{
+		fprintf(stderr, "Failed to open file %s", filename.c_str());
+		fclose(mesh_sample_file);
+		exit(-1);
+	}
+
+	data.samples.clear();
+	data.x_min = data.y_min = data.z_min = FLT_MAX;
+	data.x_max = data.y_max = data.z_max = -FLT_MAX;
+
+	float x, y, z;
+	while(fscanf(mesh_sample_file, "%f %f %f", &x, &y, &z) != EOF)
+	{
+		data.samples.push_back(std::make_pair(Point(x, y), z));
+	}
+
+	if(x < data.x_min)
+		data.x_min = x;
+	if(x > data.x_max)
+		data.x_max = x;
+
+	if(y < data.y_min)
+		data.y_min = y;
+	if(y > data.y_max)
+		data.y_max = y;
+
+	if(z < data.z_min)
+		data.z_min = z;
+	if(z > data.z_max)
+		data.z_max = z;
+
+	/*	float x_trans = -(data.x_min + ( data.x_max - data.x_min)/2.0f);
+	float y_trans = -(data.y_min + ( data.y_max - data.y_min)/2.0f);
+	float z_trans = -(data.z_min + ( data.z_max - data.z_min)/2.0f);
+
+	for(vector<Point>::iterator sample = data.samples.begin();
+		sample != data.samples.end();
+		sample++)
+	{
+		sample->x += x_trans;
+		sample->y += y_trans;
+		sample->z += z_trans;
+		}*/
+
+	fclose(mesh_sample_file);
+}
 
 void generatePoints(int num_points, Points& input, int seed=1)
 {
@@ -81,8 +143,8 @@ void DisplayFunc(void)
 	glPointSize(4.0f);
 	glColor3f(1.0f, 1.0f, 1.0f);
 	glBegin(GL_POINTS); {
-		for(Points::const_iterator point = input.begin();
-			point != input.end();
+		for(Points::const_iterator point = g_mesh_samples.samples.begin();
+			point != g_mesh_samples.samples.end();
 			point++)
 		{
 			glVertex3f((float)point->first.x(), (float)point->first.y(), (float)point->second);
@@ -152,13 +214,13 @@ void KeyboardFunc(unsigned char key, int x, int y)
 	case 'q':
 		exit(0);
 		break;
-	case 'T':
+		/*	case 'T':
 	case 't':
 		generatePoints(NUM_POINTS, input, ++g_seed);
 		printf("seed %d\n", g_seed);
 		new_dt.insert(input.begin(), input.end());
 		dt = new_dt;
-		break;
+		break;*/
 	case 'V':
 	case 'v':
 		g_show_voronoi = !g_show_voronoi;
@@ -225,32 +287,22 @@ void ReshapeFunc(int x, int y)
 int main(int argc, char** argv)
 {
 
+	if(argc <= 1)
+	{
+		fprintf(stderr, "You must supply a filename\n");
+		return 1;
+	}
+
 	g_camera.radius = 10.0f;
 	g_camera.phi = 1.57;
 	g_camera.theta = 1.57;
 
-	generatePoints(NUM_POINTS, input, ++g_seed);
+	//generatePoints(NUM_POINTS, input, ++g_seed);
 
-	dt.insert(input.begin(), input.end());
+	readMeshSamplesFile(argv[1], g_mesh_samples);
 	
-	std::cout << dt.number_of_vertices() << std::endl;
-
-	int nl = 0;
-	int nr = 0;
-	for(Delaunay::Edge_iterator edge = dt.edges_begin();
-		edge != dt.edges_end();
-		edge++)
-	{
-		CGAL::Object o = dt.dual(edge);
-		if(CGAL::object_cast<K::Segment_2>(&o))
-			nl++;
-		else if(CGAL::object_cast<K::Ray_2>(&o))
-			nr++;
-	}
-
-	std::cout << "The Voronoi diagram has " << nl << " line segments and " << nr << " rays." << std::endl;
-
-
+	dt.insert(g_mesh_samples.samples.begin(), g_mesh_samples.samples.end());
+	
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowPosition(100, 100);
