@@ -11,6 +11,7 @@
 
 #include <vector>
 #include <string>
+#include <random>
 
 #include "mesh_sampler_utils.h"
 
@@ -23,6 +24,9 @@ int main(int argc, char** argv)
 {
 	char* in_filename;
 	char* out_filename;
+	int num_samples = 1;
+	bool add_noise = false;
+	float std_dev = 0;
 
 	if(argc <= 2)
 	{
@@ -33,9 +37,24 @@ int main(int argc, char** argv)
 	{
 		in_filename = argv[1];
 		out_filename = argv[2];
+		if(argc >= 4)
+		{
+			num_samples = atoi(argv[3]);
+		}
+		if(argc >= 5)
+		{
+			add_noise = true;
+			std_dev = atof(argv[4]);
+		}
 	}
 
-	printf("Sampling mesh %s\n Saving samples to %s\n", in_filename, out_filename);
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::normal_distribution<> gauss(0, std_dev);
+
+	std::uniform_real_distribution<> uniform(0, 1);
+	
+	printf("Sampling mesh %s with %d samples per triangle.\nSaving samples to %s\n", in_filename, num_samples, out_filename);
 
 	vector<shape_t> shapes;
 
@@ -75,12 +94,34 @@ int main(int argc, char** argv)
 			v2.x = shape->mesh.positions[shape->mesh.indices[i+2]*3];
 			v2.y = shape->mesh.positions[shape->mesh.indices[i+2]*3+1];
 			v2.z = shape->mesh.positions[shape->mesh.indices[i+2]*3+2];
-			
-			Point sample_point;
-			sample_point.x = .33*v0.x + .33*v1.x + (1-.66)*v2.x;
-			sample_point.y = .33*v0.y + .33*v1.y + (1-.66)*v2.y;
-			sample_point.z = .33*v0.z + .33*v1.z + (1-.66)*v2.z;
-			sample_points.push_back(sample_point);
+
+			for(int j=0; j<num_samples; j++)
+			{
+				float u = uniform(gen);
+				float v = (1-u)*uniform(gen);
+				Point sample_point;
+				sample_point.x = u*v0.x + v*v1.x + (1-u-v)*v2.x;
+				sample_point.y = u*v0.y + v*v1.y + (1-u-v)*v2.y;
+				sample_point.z = u*v0.z + v*v1.z + (1-u-v)*v2.z;
+
+				if(add_noise)
+				{
+					float dim_chance = uniform(gen);
+					if(dim_chance < .33)
+					{
+						sample_point.x += gauss(gen);
+					}
+					else if(dim_chance < .66)
+					{
+						sample_point.y += gauss(gen);
+					}
+					else
+					{
+						sample_point.z += gauss(gen);
+					}
+				}
+				sample_points.push_back(sample_point);
+			}
 		}
 	}
 
