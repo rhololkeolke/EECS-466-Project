@@ -98,3 +98,11 @@ target_link_libraries(array_convex_hull_2 ${LIBS})
 
 add_executable(delaunay_surface src/cgal/delaunay_surface.cpp)
 target_link_libraries(delaunay_surface ${LIBS})
+
+
+####################
+# Mesh Comparisons #
+####################
+
+add_executable(hausdorf_mesh_vertices src/mesh_comparison/hausdorf_mesh_vertices.cpp)
+target_link_libraries(hausdorf_mesh_vertices tinyobjloader)
