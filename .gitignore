@@ -69,4 +69,4 @@ packages/
 
 # Build output
 *.o
-*.a
+**/build/*.a
