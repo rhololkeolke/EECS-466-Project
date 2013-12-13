@@ -2,6 +2,10 @@
 #include <CGAL/Triangulation_vertex_base_with_info_2.h>
 #include <CGAL/Delaunay_triangulation_2.h>
 
+#include <CGAL/Simple_cartesian.h>
+#include <CGAL/Polyhedron_incremental_builder_3.h>
+#include <CGAL/Polyhedron_3.h>
+
 #include <GL/glut.h>
 
 #include <vector>
@@ -17,6 +21,11 @@ typedef CGAL::Triangulation_vertex_base_with_info_2<float, K>    Vb;
 typedef CGAL::Triangulation_data_structure_2<Vb>                    Tds;
 typedef CGAL::Delaunay_triangulation_2<K, Tds> Delaunay;
 typedef K::Point_2 Point;
+typedef K::Point_3 Point3;
+
+typedef CGAL::Simple_cartesian<double>     Kernel;
+typedef CGAL::Polyhedron_3<Kernel>         Polyhedron;
+typedef Polyhedron::HalfedgeDS             HalfedgeDS;
 
 typedef std::vector<std::pair<Point, float> > Points;
 
@@ -42,6 +51,8 @@ typedef struct Camera_
 	float radius;
 	float phi;
 	float theta;
+
+	float x, y, z;
 } Camera;
 
 Camera g_camera;
@@ -56,7 +67,41 @@ typedef struct MeshSamples_
 
 MeshSamples g_mesh_samples;
 
-void readMeshSamplesFile(std::string filename, MeshSamples& data)
+// A modifier creating a triangle with the incremental builder.
+template<class HDS>
+class polyhedron_builder : public CGAL::Modifier_base<HDS> {
+public:
+ std::vector<double> &coords;
+ std::vector<int>    &tris;
+    polyhedron_builder( std::vector<double> &_coords, std::vector<int> &_tris ) : coords(_coords), tris(_tris) {}
+    void operator()( HDS& hds) {
+  typedef typename HDS::Vertex   Vertex;
+        typedef typename Vertex::Point Point;
+ 
+  // create a cgal incremental builder
+        CGAL::Polyhedron_incremental_builder_3<HDS> B( hds, true);
+        B.begin_surface( coords.size()/3, tris.size()/3 );
+   
+  // add the polyhedron vertices
+  for( int i=0; i<(int)coords.size(); i+=3 ){
+   B.add_vertex( Point( coords[i+0], coords[i+1], coords[i+2] ) );
+  }
+   
+  // add the polyhedron triangles
+  for( int i=0; i<(int)tris.size(); i+=3 ){
+   B.begin_facet();
+   B.add_vertex_to_facet( tris[i+0] );
+   B.add_vertex_to_facet( tris[i+1] );
+   B.add_vertex_to_facet( tris[i+2] );
+   B.end_facet();
+  }
+   
+  // finish up the surface
+        B.end_surface();
+    }
+};
+
+void readMeshSamplesFile(std::string filename, MeshSamples& data, int line_skip=1)
 {
 	FILE* mesh_sample_file;
 	mesh_sample_file = fopen(filename.c_str(), "r");
@@ -69,13 +114,16 @@ void readMeshSamplesFile(std::string filename, MeshSamples& data)
 	}
 
 	data.samples.clear();
+	Points samples;
 	data.x_min = data.y_min = data.z_min = FLT_MAX;
 	data.x_max = data.y_max = data.z_max = -FLT_MAX;
 
 	float x, y, z;
+	int line = -1;
 	while(fscanf(mesh_sample_file, "%f %f %f", &x, &y, &z) != EOF)
 	{
-		data.samples.push_back(std::make_pair(Point(x, y), z));
+		if(++line % line_skip == 0)
+			samples.push_back(std::make_pair(Point(x, y), z));
 	}
 
 	if(x < data.x_min)
@@ -93,20 +141,29 @@ void readMeshSamplesFile(std::string filename, MeshSamples& data)
 	if(z > data.z_max)
 		data.z_max = z;
 
-	/*	float x_trans = -(data.x_min + ( data.x_max - data.x_min)/2.0f);
+	float x_trans = -(data.x_min + ( data.x_max - data.x_min)/2.0f);
 	float y_trans = -(data.y_min + ( data.y_max - data.y_min)/2.0f);
 	float z_trans = -(data.z_min + ( data.z_max - data.z_min)/2.0f);
 
-	for(vector<Point>::iterator sample = data.samples.begin();
-		sample != data.samples.end();
+	for(Points::iterator sample = samples.begin();
+		sample != samples.end();
 		sample++)
 	{
-		sample->x += x_trans;
-		sample->y += y_trans;
-		sample->z += z_trans;
-		}*/
+		data.samples.push_back(std::make_pair(Point(sample->first.x() + x_trans,
+													sample->first.y() + y_trans),
+											  sample->second + z_trans));
+	}
 
 	fclose(mesh_sample_file);
+}
+
+void writeObjFile(char* filename, Delaunay& dt)
+{
+	Polyhedron poly;
+
+	
+	
+	//poly.write_file_obj(filename);
 }
 
 void generatePoints(int num_points, Points& input, int seed=1)
@@ -137,8 +194,11 @@ void DisplayFunc(void)
 			  0.0, 0.0, 0.0,
 			  0.0, 1.0, 0.0);
 
+	glTranslatef(g_camera.x, g_camera.y, g_camera.z);
+
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
+
 
 	glPointSize(4.0f);
 	glColor3f(1.0f, 1.0f, 1.0f);
@@ -225,8 +285,8 @@ void KeyboardFunc(unsigned char key, int x, int y)
 	case 'v':
 		g_show_voronoi = !g_show_voronoi;
 		break;
-	case 'D':
-	case 'd':
+	case 'B':
+	case 'b':
 		g_show_delaunay = !g_show_delaunay;
 		break;
 	case '+':
@@ -234,6 +294,22 @@ void KeyboardFunc(unsigned char key, int x, int y)
 		break;
 	case '-':
 		g_camera.radius *= 1.1f;
+		break;
+	case 'W':
+	case 'w':
+		g_camera.y -= 1.0f;
+		break;
+	case 'A':
+	case 'a':
+		g_camera.x += 1.0f;
+		break;
+	case 'S':
+	case 's':
+		g_camera.y += 1.0f;
+		break;
+	case 'D':
+	case 'd':
+		g_camera.x -= 1.0f;
 		break;
 	}
 
@@ -299,9 +375,15 @@ int main(int argc, char** argv)
 
 	//generatePoints(NUM_POINTS, input, ++g_seed);
 
-	readMeshSamplesFile(argv[1], g_mesh_samples);
+	int line_skip = 1;
+	if(argc >= 3)
+		line_skip = atoi(argv[2]);
+	readMeshSamplesFile(argv[1], g_mesh_samples, line_skip);
 	
 	dt.insert(g_mesh_samples.samples.begin(), g_mesh_samples.samples.end());
+
+	if(argc >= 4)
+		writeObjFile(argv[3], dt);
 	
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
