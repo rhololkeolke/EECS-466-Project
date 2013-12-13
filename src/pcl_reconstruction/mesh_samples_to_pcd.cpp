@@ -4,7 +4,7 @@
 #include <pcl/features/normal_3d.h>
 #include <pcl/surface/gp3.h>
 
-#include "mesh_samplers/mesh_sampler_utils.h"
+#include "../mesh_samplers/mesh_sampler_utils.h"
 
 #include <iostream>
 #include <string>

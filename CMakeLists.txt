@@ -51,11 +51,11 @@ target_link_libraries(voronoi_diagram ${LIBS})
 add_executable(animated_voronoi_diagram_example src/voronoi_diagram/main.cpp)
 target_link_libraries(animated_voronoi_diagram_example ${LIBS} voronoi_diagram)
 
-add_executable(voronoi_and_delaunay src/voronoi_and_delaunay.cpp)
+add_executable(voronoi_and_delaunay src/voronoi_diagram/voronoi_and_delaunay.cpp)
 target_link_libraries(voronoi_and_delaunay ${LIBS} voronoi_diagram)
 
-add_executable(terrain_mesh_reconstruction src/terrain_mesh_reconstruction.cpp)
-target_link_libraries(terrain_mesh_reconstruction ${LIBS} voronoi_diagram)
+add_executable(voronoi_and_delaunay_surface_reconstruction src/voronoi_diagram/voronoi_and_delaunay_surface_reconstruction.cpp)
+target_link_libraries(voronoi_and_delaunay_surface_reconstruction ${LIBS} voronoi_diagram)
 
 ##########################
 # Mesh Sampling Programs #
@@ -77,16 +77,16 @@ target_link_libraries(mesh_sample_viewer ${LIBS} mesh_sampler_utils)
 # PCL Surface Reconstruction #
 ##############################
 
-add_executable(mesh_samples_to_pcd src/mesh_samples_to_pcd)
+add_executable(mesh_samples_to_pcd src/pcl_reconstruction/mesh_samples_to_pcd)
 target_link_libraries(mesh_samples_to_pcd ${PCL_LIBRARIES} mesh_sampler_utils)
 
-add_executable(pcl_greedy_triangulation src/pcl_greedy_triangulation.cpp)
+add_executable(pcl_greedy_triangulation src/pcl_reconstruction/pcl_greedy_triangulation.cpp)
 target_link_libraries(pcl_greedy_triangulation ${PCL_LIBRARIES})
 
-add_executable(pcl_marching_cubes src/pcl_marching_cubes.cpp)
+add_executable(pcl_marching_cubes src/pcl_reconstruction/pcl_marching_cubes.cpp)
 target_link_libraries(pcl_marching_cubes ${PCL_LIBRARIES})
 
-add_executable(pcl_poisson src/pcl_poisson.cpp)
+add_executable(pcl_poisson src/pcl_reconstruction/pcl_poisson.cpp)
 target_link_libraries(pcl_poisson ${PCL_LIBRARIES})
 
 ########################
