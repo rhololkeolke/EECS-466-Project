@@ -112,7 +112,6 @@ namespace voronoi_diagram
 		{
 			curr_event_ = event_queue_.top();
 			event_queue_.pop();
-			printf("Number of deleted events: %lu\n", deleted_events_.size());
 			if(deleted_events_.find(curr_event_) != deleted_events_.end())
 			{
 				// remove from the set of deleted events
@@ -123,10 +122,12 @@ namespace voronoi_diagram
 
 			if(curr_event_->type_ == EventType::SITE)
 			{
+				printf("event: (%3.3f, %3.3f)\n", curr_event_->site_->x, curr_event_->site_->y);
 				addArc(curr_event_);
 			}
 			else
 			{
+				printf("event: (%3.3f, %3.3f)\n", curr_event_->site_->x, curr_event_->site_->y);
 				removeArc(curr_event_);
 			}
 		}
