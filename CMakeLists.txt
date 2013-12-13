@@ -41,20 +41,12 @@ include_directories(libraries/tinyobjloader)
 
 add_library(tinyobjloader libraries/tinyobjloader/tiny_obj_loader.cc)
 
+###########################
+# My Voronoi and Delaunay #
+###########################
+
 add_library(voronoi_diagram src/voronoi_diagram/beachline_node.cpp src/voronoi_diagram/voronoi_diagram.cpp src/voronoi_diagram/animated_voronoi_diagram.cpp)
 target_link_libraries(voronoi_diagram ${LIBS})
-
-add_library(mesh_sampler_utils src/mesh_sampler_utils.cpp)
-target_link_libraries(mesh_sampler_utils tinyobjloader)
-
-add_executable(mesh_surface_sampler src/mesh_surface_sampler.cpp)
-target_link_libraries(mesh_surface_sampler mesh_sampler_utils)
-
-add_executable(mesh_triangle_sampler src/mesh_triangle_sampler.cpp)
-target_link_libraries(mesh_triangle_sampler mesh_sampler_utils)
-
-add_executable(mesh_sample_viewer src/mesh_sample_viewer.cpp)
-target_link_libraries(mesh_sample_viewer ${LIBS} mesh_sampler_utils)
 
 add_executable(animated_voronoi_diagram_example src/voronoi_diagram/main.cpp)
 target_link_libraries(animated_voronoi_diagram_example ${LIBS} voronoi_diagram)
@@ -64,6 +56,26 @@ target_link_libraries(voronoi_and_delaunay ${LIBS} voronoi_diagram)
 
 add_executable(terrain_mesh_reconstruction src/terrain_mesh_reconstruction.cpp)
 target_link_libraries(terrain_mesh_reconstruction ${LIBS} voronoi_diagram)
+
+##########################
+# Mesh Sampling Programs #
+##########################
+
+add_library(mesh_sampler_utils src/mesh_samplers/mesh_sampler_utils.cpp)
+target_link_libraries(mesh_sampler_utils tinyobjloader)
+
+add_executable(mesh_surface_sampler src/mesh_samplers/mesh_surface_sampler.cpp)
+target_link_libraries(mesh_surface_sampler mesh_sampler_utils)
+
+add_executable(mesh_triangle_sampler src/mesh_samplers/mesh_triangle_sampler.cpp)
+target_link_libraries(mesh_triangle_sampler mesh_sampler_utils)
+
+add_executable(mesh_sample_viewer src/mesh_samplers/mesh_sample_viewer.cpp)
+target_link_libraries(mesh_sample_viewer ${LIBS} mesh_sampler_utils)
+
+##############################
+# PCL Surface Reconstruction #
+##############################
 
 add_executable(mesh_samples_to_pcd src/mesh_samples_to_pcd)
 target_link_libraries(mesh_samples_to_pcd ${PCL_LIBRARIES} mesh_sampler_utils)
@@ -77,10 +89,12 @@ target_link_libraries(pcl_marching_cubes ${PCL_LIBRARIES})
 add_executable(pcl_poisson src/pcl_poisson.cpp)
 target_link_libraries(pcl_poisson ${PCL_LIBRARIES})
 
-# CGAL
+########################
+# CGAL Implementations #
+########################
 
-add_executable(array_convex_hull_2 src/cgal_examples/array_convex_hull_2.cpp)
+add_executable(array_convex_hull_2 src/cgal/array_convex_hull_2.cpp)
 target_link_libraries(array_convex_hull_2 ${LIBS})
 
-add_executable(delaunay_surface src/cgal_examples/delaunay_surface.cpp)
+add_executable(delaunay_surface src/cgal/delaunay_surface.cpp)
 target_link_libraries(delaunay_surface ${LIBS})
