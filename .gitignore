@@ -70,3 +70,5 @@ packages/
 # Build output
 *.o
 **/build/*.a
+*.xyz
+*.pcd
