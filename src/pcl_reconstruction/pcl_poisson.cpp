@@ -29,6 +29,8 @@ int main(int argc, char** argv)
 	pcl::Poisson<pcl::PointNormal> poisson;
 	pcl::PolygonMesh triangles;
 
+	poisson.setDepth(10);
+	
 	poisson.setInputCloud(cloud_with_normals);
 	poisson.setSearchMethod(tree);
 	poisson.reconstruct(triangles);
