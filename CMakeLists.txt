@@ -62,3 +62,6 @@ target_link_libraries(mesh_samples_to_pcd ${PCL_LIBRARIES} mesh_sampler_utils)
 
 add_executable(pcl_greedy_triangulation src/pcl_greedy_triangulation.cpp)
 target_link_libraries(pcl_greedy_triangulation ${PCL_LIBRARIES})
+
+add_executable(pcl_marching_cubes src/pcl_marching_cubes.cpp)
+target_link_libraries(pcl_marching_cubes ${PCL_LIBRARIES})
