@@ -29,7 +29,7 @@ int main(int argc, char** argv)
 	pcl::MarchingCubesHoppe<pcl::PointNormal> mc;
 	pcl::PolygonMesh triangles;
 
-	mc.setGridResolution(50, 50, 50);
+	mc.setGridResolution(100, 100, 100);
 	mc.setIsoLevel(0);
 	mc.setPercentageExtendGrid(0);
 
