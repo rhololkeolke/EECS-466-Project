@@ -84,12 +84,34 @@ for xyz_file in $xyz_files; do
     echo "Reconstructing $xyz_file with powercrust"
 
     pushd $powercrust_temp_dir
-    powercrust -i $output_path/xyz/$(basename $xyz_file)
+    powercrust -i $output_path/xyz/$(basename $xyz_file) 2> /dev/null
 
-    meshlabserver -i pc.off -o $output_path/obj/$(echo $(basename $xyz_file) | sed 's/\.xyz$/_powercrust\.obj/')
+    meshlabserver -i pc.off -o $output_path/obj/$(echo $(basename $xyz_file) | sed 's/\.xyz$/_powercrust\.obj/') 2> /dev/null
     popd
 done
 
 # calculate the mesh differences
 touch $2/mesh_differences.csv
 echo "mesh name, xyz file, pcd file, poisson file, poisson difference, marching cubes file, marching cubes difference, powercrust file, powercrust difference" >> $2/mesh_differences.csv
+
+for mesh_file in $mesh_files; do
+
+    pushd $(dirname $mesh_file)
+
+    pwd
+
+    echo "Getting difference in poisson mesh"
+    poisson_diff=$(hausdorf_mesh_vertices $(basename $mesh_file) $output_path/obj/$(echo $(basename $mesh_file) | sed 's/\.obj/_poisson\.obj/') | grep 'Distance:' | sed -r 's/[^0-9\.]+//')
+
+
+    echo "Getting difference in marching cubes mesh"
+    marching_cubes_diff=$(hausdorf_mesh_vertices $(basename $mesh_file) $output_path/obj/$(echo $(basename $mesh_file) | sed 's/\.obj/_marching_cubes\.obj/') | grep 'Distance:' | sed -r 's/[^0-9\.]+//')
+
+
+    echo "Getting difference in powercrust mesh"
+    powercrust_diff=$(hausdorf_mesh_vertices $(basename $mesh_file) $output_path/obj/$(echo $(basename $mesh_file) | sed 's/\.obj/_powercrust\.obj/') | grep 'Distance:' | sed -r 's/[^0-9\.]+//')
+
+    popd
+
+    echo "$(basename $mesh_file), $(echo $(basename $mesh_file) | sed 's/\.obj/\.xyz/'), $(echo $(basename $mesh_file) | sed 's/\.obj/\.pcd/'), $(echo $(basename $mesh_file) | sed 's/\.obj/_poisson\.obj/'), $poisson_diff, $(echo $(basename $mesh_file) | sed 's/\.obj/_marching_cubes\.obj/'), $marching_cubes_diff, $(echo $(basename $mesh_file) | sed 's/\.obj/_powercrust\.obj/'), $powercrust_diff" >> $2/mesh_differences.csv
+done
