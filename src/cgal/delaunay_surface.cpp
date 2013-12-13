@@ -2,14 +2,11 @@
 #include <CGAL/Triangulation_vertex_base_with_info_2.h>
 #include <CGAL/Delaunay_triangulation_2.h>
 
-#include <CGAL/Simple_cartesian.h>
-#include <CGAL/Polyhedron_incremental_builder_3.h>
-#include <CGAL/Polyhedron_3.h>
-
 #include <GL/glut.h>
 
 #include <vector>
 #include <iostream>
+#include <fstream>
 
 #include <cstdlib>
 #include <cfloat>
@@ -22,10 +19,6 @@ typedef CGAL::Triangulation_data_structure_2<Vb>                    Tds;
 typedef CGAL::Delaunay_triangulation_2<K, Tds> Delaunay;
 typedef K::Point_2 Point;
 typedef K::Point_3 Point3;
-
-typedef CGAL::Simple_cartesian<double>     Kernel;
-typedef CGAL::Polyhedron_3<Kernel>         Polyhedron;
-typedef Polyhedron::HalfedgeDS             HalfedgeDS;
 
 typedef std::vector<std::pair<Point, float> > Points;
 
@@ -66,40 +59,6 @@ typedef struct MeshSamples_
 } MeshSamples;
 
 MeshSamples g_mesh_samples;
-
-// A modifier creating a triangle with the incremental builder.
-template<class HDS>
-class polyhedron_builder : public CGAL::Modifier_base<HDS> {
-public:
- std::vector<double> &coords;
- std::vector<int>    &tris;
-    polyhedron_builder( std::vector<double> &_coords, std::vector<int> &_tris ) : coords(_coords), tris(_tris) {}
-    void operator()( HDS& hds) {
-  typedef typename HDS::Vertex   Vertex;
-        typedef typename Vertex::Point Point;
- 
-  // create a cgal incremental builder
-        CGAL::Polyhedron_incremental_builder_3<HDS> B( hds, true);
-        B.begin_surface( coords.size()/3, tris.size()/3 );
-   
-  // add the polyhedron vertices
-  for( int i=0; i<(int)coords.size(); i+=3 ){
-   B.add_vertex( Point( coords[i+0], coords[i+1], coords[i+2] ) );
-  }
-   
-  // add the polyhedron triangles
-  for( int i=0; i<(int)tris.size(); i+=3 ){
-   B.begin_facet();
-   B.add_vertex_to_facet( tris[i+0] );
-   B.add_vertex_to_facet( tris[i+1] );
-   B.add_vertex_to_facet( tris[i+2] );
-   B.end_facet();
-  }
-   
-  // finish up the surface
-        B.end_surface();
-    }
-};
 
 void readMeshSamplesFile(std::string filename, MeshSamples& data, int line_skip=1)
 {
@@ -159,11 +118,47 @@ void readMeshSamplesFile(std::string filename, MeshSamples& data, int line_skip=
 
 void writeObjFile(char* filename, Delaunay& dt)
 {
-	Polyhedron poly;
+	std::vector<float> coords;
 
-	
-	
-	//poly.write_file_obj(filename);
+	int num_faces = 0;
+	for(Delaunay::Finite_faces_iterator face = dt.finite_faces_begin();
+		face != dt.finite_faces_end();
+		face++)
+	{
+		num_faces++;
+		for(int i=0; i<3; i++)
+		{
+			coords.push_back(face->vertex(i)->point().x());
+			coords.push_back(face->vertex(i)->point().y());
+			coords.push_back(face->vertex(i)->info());
+		}
+	}
+
+	printf("Number of faces: %d\n", num_faces);
+	printf("Number of coords: %d\n", coords.size());
+
+	FILE* mesh_file = fopen(filename, "w");
+
+	if(!mesh_file)
+	{
+		fprintf(stderr, "Could not open %s for writing\n", filename);
+
+		return;
+	}
+
+	for(int i=0; i<(int)coords.size(); i += 3)
+	{
+		fprintf(mesh_file, "v %f %f %f\n", coords[i], coords[i+1], coords[i+2]);
+	}
+
+	fprintf(mesh_file, "\n");
+
+	for(int i=0; i<(int)coords.size()/3; i += 3)
+	{
+		fprintf(mesh_file, "f %i %i %i\n", i+1, i+2, i+3);
+	}
+
+	fclose(mesh_file);
 }
 
 void generatePoints(int num_points, Points& input, int seed=1)
