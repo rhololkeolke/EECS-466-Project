@@ -8,6 +8,7 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <random>
 
 #include "mesh_sampler_utils.h"
 
@@ -21,6 +22,8 @@ int main(int argc, char** argv)
 	char* in_filename;
 	char* out_filename;
 	int num_rays = 40;
+	bool add_noise = false;
+	float std_dev = 0;
 
 	if(argc <= 2)
 	{
@@ -35,8 +38,16 @@ int main(int argc, char** argv)
 		{
 			num_rays = atoi(argv[3]);
 		}
-
+		if(argc >= 5)
+		{
+			add_noise = true;
+			std_dev = atof(argv[4]);
+		}
 	}
+
+	std::random_device rd;
+    std::mt19937 gen(rd());
+    std::normal_distribution<> d(0,std_dev);
 
 	vector<shape_t> shapes;
 
@@ -101,7 +112,7 @@ int main(int argc, char** argv)
 					v2.x = shape->mesh.positions[shape->mesh.indices[k+2]*3];
 					v2.y = shape->mesh.positions[shape->mesh.indices[k+2]*3+1];
 					v2.z = shape->mesh.positions[shape->mesh.indices[k+2]*3+2];
-				
+
 					float t = intersectMesh(start, dir, v0, v1, v2);
 					if(t < min_t && t >= 0)
 						min_t = t;
@@ -110,6 +121,11 @@ int main(int argc, char** argv)
 			
 			if(min_t == FLT_MAX)
 				continue;
+
+			if(add_noise)
+			{
+				min_t += d(gen);
+			}
 			
 			Point sample_point;
 			sample_point.x = start.x + dir.i*min_t;
