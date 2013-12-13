@@ -65,3 +65,6 @@ target_link_libraries(pcl_greedy_triangulation ${PCL_LIBRARIES})
 
 add_executable(pcl_marching_cubes src/pcl_marching_cubes.cpp)
 target_link_libraries(pcl_marching_cubes ${PCL_LIBRARIES})
+
+add_executable(pcl_poisson src/pcl_poisson.cpp)
+target_link_libraries(pcl_poisson ${PCL_LIBRARIES})
