@@ -65,10 +65,31 @@ mkdir -p $2/obj
 # run the pcd files through the marching cubes and poisson programs
 for pcd_file in $pcd_files; do
     pushd $(dirname $pcd_file)
-    echo "Reconstructing with marching cubes"
+    echo "Reconstructing $pcd_file with marching cubes"
     pcl_marching_cubes $(basename $pcd_file) ../obj/$(echo $(basename $pcd_file) | sed 's/\.pcd$/_marching_cubes\.obj/')
 
-    echo "Reconstructing with poisson"
+    echo "Reconstructing $pcd_file with poisson"
     pcl_poisson $(basename $pcd_file) ../obj/$(echo $(basename $pcd_file) | sed 's/\.pcd$/_poisson\.obj/')
     popd
 done
+
+# run the xyz files through the powercrust programs
+
+mkdir -p $2/off
+powercrust_temp_dir=$(mktemp -d)
+output_path=$(readlink -e $2)
+
+# convert mesh samples to off files
+for xyz_file in $xyz_files; do
+    echo "Reconstructing $xyz_file with powercrust"
+
+    pushd $powercrust_temp_dir
+    powercrust -i $output_path/xyz/$(basename $xyz_file)
+
+    meshlabserver -i pc.off -o $output_path/obj/$(echo $(basename $xyz_file) | sed 's/\.xyz$/_powercrust\.obj/')
+    popd
+done
+
+# calculate the mesh differences
+touch $2/mesh_differences.csv
+echo "mesh name, xyz file, pcd file, poisson file, poisson difference, marching cubes file, marching cubes difference, powercrust file, powercrust difference" >> $2/mesh_differences.csv
