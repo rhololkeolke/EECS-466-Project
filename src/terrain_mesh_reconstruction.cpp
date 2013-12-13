@@ -1,4 +1,8 @@
+#include <GL/glew.h>
 #include <GL/glut.h>
+#include <GL/glu.h>
+#include <GL/gl.h>
+
 #include <voronoi_diagram.h>
 #include <animated_voronoi_diagram.h>
 #include <cstdlib>
@@ -8,13 +12,18 @@
 
 #include <vector>
 #include <string>
+#include <iostream>
 
 #define PI 3.14159265359
+#define PrintOpenGLError()::PrintOGLError(__FILE__, __LINE__)
 
 using namespace voronoi_diagram;
+using std::cout;
+using std::endl;
 
 bool g_show_delaunay = true;
 bool g_show_voronoi = true;
+bool g_wireframe = true;
 
 int WindowWidth = 640;
 int WindowHeight = 640;
@@ -45,6 +54,148 @@ typedef struct Camera_
 
 TerrainData g_terrain_data;
 Camera g_camera;
+
+int program = -1;
+GLuint mesh_shader;
+
+int PrintOGLError(char *file, int line)
+{
+    GLenum glErr;
+    int    retCode = 0;
+
+    glErr = glGetError();
+    while (glErr != GL_NO_ERROR)
+    {
+        printf("glError in file %s @ line %d: %s\n", file, line, gluErrorString(glErr));
+        retCode = 1;
+        glErr = glGetError();
+    }
+    return retCode;
+}
+
+
+char *shaderFileRead(const char *fn) {
+
+
+	FILE *fp = fopen(fn,"r");
+	if(!fp)
+	{
+		cout<< "Failed to load " << fn << endl;
+		return " ";
+	}
+	else
+	{
+		cout << "Successfully loaded " << fn << endl;
+	}
+	
+	char *content = NULL;
+
+	int count=0;
+
+	if (fp != NULL) 
+	{
+		fseek(fp, 0, SEEK_END);
+		count = ftell(fp);
+		rewind(fp);
+
+		if (count > 0) 
+		{
+			content = (char *)malloc(sizeof(char) * (count+1));
+			count = fread(content,sizeof(char),count,fp);
+			content[count] = '\0';
+		}
+		fclose(fp);
+	}
+	return content;
+}
+
+void setShaders(std::string vertex_shader_filename, std::string fragment_shader_filename, GLuint& program) {
+
+	char *vs = NULL,*fs = NULL;
+
+	GLuint vertex_shader = glCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
+	GLuint fragment_shader = glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
+
+	//read the shader files and store the strings in corresponding char. arrays.
+	vs = shaderFileRead(vertex_shader_filename.c_str());
+	fs = shaderFileRead(fragment_shader_filename.c_str());
+
+	const char * vv = vs;
+	const char * ff = fs;
+
+	//set the shader's source code by using the strings read from the shader files.
+	glShaderSourceARB(vertex_shader, 1, &vv,NULL);
+	glShaderSourceARB(fragment_shader, 1, &ff,NULL);
+
+	free(vs);free(fs);
+
+	//Compile the shader objects
+	glCompileShaderARB(vertex_shader);
+	glCompileShaderARB(fragment_shader);
+
+
+	//create an empty program object to attach the shader objects
+	program = glCreateProgramObjectARB();
+
+	//attach the shader objects to the program object
+	glAttachObjectARB(program, vertex_shader);
+	glAttachObjectARB(program, fragment_shader);
+
+	/*
+	**************
+	Programming Tip:
+	***************
+	Delete the attached shader objects once they are attached.
+	They will be flagged for removal and will be freed when they are no more used.
+	*/
+	glDeleteObjectARB(vertex_shader);
+	glDeleteObjectARB(fragment_shader);
+
+	//Link the created program.
+	/*
+	**************
+	Programming Tip:
+	***************
+	You can trace the status of link operation by calling 
+	"glGetObjectParameterARB(p,GL_OBJECT_LINK_STATUS_ARB)"
+	*/
+	glLinkProgramARB(program);
+
+	//Start to use the program object, which is the part of the current rendering state
+	//glUseProgramObjectARB(program);
+}
+
+void error_exit(int status, char *text)
+{
+
+	// Print error message
+
+	fprintf(stderr,"Internal Error %i: ", status);
+	fprintf(stderr,text);
+	printf("\nTerminating as Result of Internal Error.\nPress Enter to exit.\n");
+
+	// Keep the terminal open
+
+	int anyKey = getchar();
+
+	// Exit program
+
+	exit(status);
+}
+
+int getUniformVariable(GLuint program,char *name)
+{
+	int location = glGetUniformLocationARB(program, name);
+	
+	if (location == -1)
+	{
+		char error_msg[100];
+		sprintf(error_msg, "No such uniform variable %s", name);
+ 		error_exit(1007, error_msg);
+	}
+	PrintOpenGLError();
+	return location;
+}
 
 void readTerrainData(std::string filename, TerrainData& data, int line_skip=1)
 {

@@ -3,14 +3,22 @@ project(eecs466_project)
 
 set(CMAKE_BUILD_TYPE Debug)
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
+
 find_package(OpenGL REQUIRED)
 find_package(GLUT REQUIRED)
 find_package(PCL 1.7 REQUIRED COMPONENTS common io kdtree features surface search)
+find_package(CGAL COMPONENTS Core)
+find_package(GLEW REQUIRED)
+
+include(${CGAL_USE_FILE})
+include(CGAL_CreateSingleSourceCGALProgram)
 
 include_directories(
 ${PCL_INCLUDE_DIRS}
 ${OpenGL_INCLUDE_DIRS}
 ${GLUT_INCLUDE_DIRS}
+${GLEW_INCLUDE_DIR}
 )
 
 link_directories(${PCL_LIBRARY_DIRS})
@@ -19,7 +27,7 @@ add_definitions(${PCL_DEFINITIONS})
 
 set(PCL_LIBRARIES ${PCL_COMMON_LIBRARIES} ${PCL_IO_LIBRARIES} ${PCL_KDTREE_LIBRARIES} ${PCL_FEATURES_LIBRARIES} ${PCL_SURFACE_LIBRARIES} ${PCL_SEARCH_LIBRARIES})
 
-set(LIBS ${PCL_LIBRARIES} ${OpenGL_LIBRARIES} ${GLUT_LIBRARIES} GLU m)
+set(LIBS ${PCL_LIBRARIES} ${OpenGL_LIBRARIES} ${GLUT_LIBRARIES} GLU ${GLEW_LIBRARY} ${CGAL_LIBRARIES} m)
 
 if(CMAKE_COMPILER_IS_GNUCXX)
     add_definitions(-std=gnu++0x)
@@ -68,3 +76,11 @@ target_link_libraries(pcl_marching_cubes ${PCL_LIBRARIES})
 
 add_executable(pcl_poisson src/pcl_poisson.cpp)
 target_link_libraries(pcl_poisson ${PCL_LIBRARIES})
+
+# CGAL
+
+add_executable(array_convex_hull_2 src/cgal_examples/array_convex_hull_2.cpp)
+target_link_libraries(array_convex_hull_2 ${LIBS})
+
+add_executable(delaunay_surface src/cgal_examples/delaunay_surface.cpp)
+target_link_libraries(delaunay_surface ${LIBS})
