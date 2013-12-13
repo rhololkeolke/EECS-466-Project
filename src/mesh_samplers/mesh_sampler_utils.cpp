@@ -36,28 +36,35 @@ float intersectMesh(const Point& start, const Vector& dir, const Vertex& v0, con
 		return -1;
 }
 
-BoundingBox findBoundingBox(const std::vector<float>& vertices)
+BoundingBox findBoundingBox(const std::vector<tinyobj::shape_t>& shapes)
 {
 	BoundingBox result;
 	result.x_min = result.y_min = result.z_min = FLT_MAX;
 	result.x_max = result.y_max = result.z_max = -FLT_MAX;
 
-	for(int i=0; i < (int)vertices.size(); i += 3)
+	for(std::vector<tinyobj::shape_t>::const_iterator shape = shapes.begin();
+		shape != shapes.end();
+		shape++)
 	{
-		if(vertices[i] < result.x_min)
-			result.x_min = vertices[i];
-		if(vertices[i] > result.x_max)
-			result.x_max = vertices[i];
 
-		if(vertices[i+1] < result.y_min)
-			result.y_min = vertices[i+1];
-		if(vertices[i+1] > result.y_max)
-			result.y_max = vertices[i+1];
+		std::vector<float> vertices(shape->mesh.positions.begin(), shape->mesh.positions.end());
+		for(int i=0; i < (int)vertices.size(); i += 3)
+		{
+			if(vertices[i] < result.x_min)
+				result.x_min = vertices[i];
+			if(vertices[i] > result.x_max)
+				result.x_max = vertices[i];
+			
+			if(vertices[i+1] < result.y_min)
+				result.y_min = vertices[i+1];
+			if(vertices[i+1] > result.y_max)
+				result.y_max = vertices[i+1];
 
-		if(vertices[i+2] < result.z_min)
-			result.z_min = vertices[i+2];
-		if(vertices[i+2] > result.z_max)
-			result.z_max = vertices[i+2];
+			if(vertices[i+2] < result.z_min)
+				result.z_min = vertices[i+2];
+			if(vertices[i+2] > result.z_max)
+				result.z_max = vertices[i+2];
+		}
 	}
 
 	return result;

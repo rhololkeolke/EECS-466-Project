@@ -54,7 +54,7 @@ inline float dot(const Vector& v1, const Vector& v2)
 
 float intersectMesh(const Point& start, const Vector& dir, const Vertex& v0, const Vertex& v1, const Vertex& v2);
 
-BoundingBox findBoundingBox(const std::vector<float>& vertices);
+BoundingBox findBoundingBox(const std::vector<tinyobj::shape_t>& shapes);
 
 void rotationMatrixAboutAxis(RotationAxis axis, float angle, float* rot_mat);
 
