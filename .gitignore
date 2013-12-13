@@ -3,7 +3,7 @@
 *.DS_Store
 
 #Visual Studio files
-*.[Oo]bj
+**/src/*.[Oo]bj
 *.user
 *.aps
 *.pch
@@ -66,3 +66,7 @@ packages/
 # Emacs temp files
 *~
 \#*\#
+
+# Build output
+*.o
+*.a
