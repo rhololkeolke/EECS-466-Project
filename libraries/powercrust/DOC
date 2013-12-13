@@ -1,0 +1,31 @@
+* Source files
+1) *.c
+
+hullmain.c
+hull.c
+power.c
+crust.c
+io.c
+label.c
+heap.c
+math.c
+pointops.c
+predicates.c
+ch.c
+fg.c
+rand.c
+powershape.C
+setNormals.C
+
+2) *.h
+
+hull.h
+points.h
+pointsites.h
+stormacs.h
+sdefs.h
+ndefs.h
+
+* Example input file  - hotdogs.pts
+
+* NOTES - notes on how to run the program.
