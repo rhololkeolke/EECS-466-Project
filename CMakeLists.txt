@@ -106,3 +106,9 @@ target_link_libraries(delaunay_surface ${LIBS})
 
 add_executable(hausdorf_mesh_vertices src/mesh_comparison/hausdorf_mesh_vertices.cpp)
 target_link_libraries(hausdorf_mesh_vertices tinyobjloader)
+
+###################
+# Powercrust Code #
+###################
+
+add_subdirectory(libraries/powercrust powercrust)
