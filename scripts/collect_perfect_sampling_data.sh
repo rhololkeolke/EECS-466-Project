@@ -33,7 +33,7 @@ for mesh_file in $mesh_files; do
     echo "Sampling $mesh_file"
 
     pushd $(dirname $mesh_file)
-    mesh_triangle_sampler $(basename $mesh_file) $2/xyz/$(echo $(basename $mesh_file) | sed 's/\.obj$/\.xyz/')
+    mesh_triangle_sampler $(basename $mesh_file) $2/xyz/$(echo $(basename $mesh_file) | sed 's/\.obj$/\.xyz/') 5
     popd
 done
 
